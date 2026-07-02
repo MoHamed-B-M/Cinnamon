@@ -152,8 +152,8 @@ fun SelectedTopBar(
                                     )
                                 )
                             )
+                            onUnselectAll()
                         }
-                        onUnselectAll()
                     }
                 ) {
                     Icon(

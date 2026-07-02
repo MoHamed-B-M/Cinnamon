@@ -148,6 +148,12 @@
     <string name="group_sub_calls">Group subsequent calls</string>
     <string name="default_sim_phone">Default sim for phone functions.</string>
     <string name="chat_color">Chat color</string>
+    <string name="default_sms_app">Default SMS app</string>
+    <string name="default_sms_app_desc">This is required to use texting capabilities</string>
+    <string name="request_permission">Request permission</string>
+    <string name="default_dialer_app">Default dialer app</string>
+    <string name="default_dialer_app_desc">This is required to use phone capabilities</string>
+    <string name="android_16_warning">On Android 16 and above, you\'ll have to allow restricted permissions in order to use the app. Click this card to learn how.</string>
 
 
     <plurals name="delete_msg">

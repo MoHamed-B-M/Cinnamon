@@ -8,7 +8,9 @@ plugins {
 }
 
 androidComponents {
-    onVariants(selector().withBuildType("release")) { variant ->
+    val release = selector().withBuildType("release")
+
+    onVariants(release) { variant ->
         val mainOutput =
             variant.outputs.single { it.outputType == VariantOutputConfiguration.OutputType.SINGLE }
 

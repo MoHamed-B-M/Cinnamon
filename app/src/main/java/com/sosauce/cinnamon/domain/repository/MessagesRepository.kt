@@ -107,7 +107,7 @@ class MessagesRepository(private val context: Context) {
                         threadId = threadId,
                         rawRecipients = rawRecipients,
                         recipients = recipients,
-                        snippet = snippet.trimIndent(),
+                        snippet = snippet,
                         date = date,
                         read = read,
                         isGroupChat = isGroupChat,

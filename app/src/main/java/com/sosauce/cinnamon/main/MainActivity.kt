@@ -14,7 +14,7 @@ import androidx.core.view.WindowCompat
 import com.sosauce.cinnamon.data.datastore.rememberAppTheme
 import com.sosauce.cinnamon.data.datastore.rememberInitialTab
 import com.sosauce.cinnamon.presentation.navigation.Nav
-import com.sosauce.cinnamon.presentation.screens.setup.SetupPermissions
+import com.sosauce.cinnamon.presentation.screens.setup.SetupScreen
 import com.sosauce.cinnamon.presentation.theme.CinnamonTheme
 import com.sosauce.cinnamon.utils.CuteTheme
 import com.sosauce.cinnamon.utils.hasBothRoles
@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
                         intent = intent
                     )
                 } else {
-                    SetupPermissions { hasBothRoles = hasBothRoles() }
+                    SetupScreen { hasBothRoles = true }
                 }
             }
         }

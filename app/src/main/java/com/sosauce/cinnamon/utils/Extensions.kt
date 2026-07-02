@@ -28,8 +28,11 @@ import android.widget.Toast
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -418,7 +421,38 @@ fun Long.toShortDate(context: Context): String {
 
 }
 
+fun Context.createDefaultSmsIntent(): Intent {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val roleManager = getSystemService(RoleManager::class.java)
+        val isRoleAvailable = roleManager.isRoleAvailable(RoleManager.ROLE_SMS)
+        return if (isRoleAvailable) {
+            roleManager.createRequestRoleIntent(RoleManager.ROLE_SMS)
+        } else {
+            Intent()
+        }
+    } else {
+        return Intent(Sms.Intents.ACTION_CHANGE_DEFAULT).apply {
+            putExtra(Sms.Intents.EXTRA_PACKAGE_NAME, packageName)
+        }
+    }
+}
 
+
+fun Context.createDefaultDialerIntent(): Intent {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val roleManager = getSystemService(RoleManager::class.java)
+        val isRoleAvailable = roleManager.isRoleAvailable(RoleManager.ROLE_DIALER)
+        return if (isRoleAvailable) {
+            roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER)
+        } else {
+            Intent()
+        }
+    } else {
+        return Intent(Sms.Intents.ACTION_CHANGE_DEFAULT).apply {
+            putExtra(Sms.Intents.EXTRA_PACKAGE_NAME, packageName)
+        }
+    }
+}
 fun Activity.requestRole(
     role: String // RoleManager.ROLE_SMS
 ) {
@@ -793,4 +827,9 @@ fun String.toPaletteStyle(): PaletteStyle {
         CutePaletteStyle.FRUIT_SALAD -> PaletteStyle.FruitSalad
         else -> throw IllegalArgumentException("Not a valid palette!")
     }
+}
+
+@Composable
+fun ColumnScope.Spacer(height: Dp) {
+    Spacer(Modifier.height(height))
 }
