@@ -33,8 +33,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.domain.model.CuteContact
-import com.sosauce.cinnamon.domain.model.CuteConversation
 import com.sosauce.cinnamon.presentation.navigation.Screen
+import com.sosauce.cinnamon.presentation.screens.messages.CuteConversationUI
 import com.sosauce.cinnamon.presentation.screens.messages.components.dialogs.DeleteConversationsDialog
 import com.sosauce.cinnamon.utils.LocalScreen
 import com.sosauce.cinnamon.utils.rememberInteractionSource
@@ -120,8 +120,8 @@ fun <T> SelectedBarSurface(
 @Composable
 fun ConversationsSelectedBar(
     modifier: Modifier = Modifier,
-    items: List<CuteConversation>,
-    multiSelectState: SweetSelectState<CuteConversation>,
+    items: List<CuteConversationUI>,
+    multiSelectState: SweetSelectState<CuteConversationUI>,
     onDeleteConversations: () -> Unit,
     onPinThreads: () -> Unit,
     onArchiveThreads: () -> Unit

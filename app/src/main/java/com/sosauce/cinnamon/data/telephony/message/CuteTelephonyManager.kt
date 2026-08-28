@@ -6,10 +6,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Telephony
+import android.telephony.PhoneNumberUtils
 import android.telephony.SmsManager
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
+import androidx.compose.ui.util.fastMap
 import androidx.core.content.contentValuesOf
+import com.android.mms.service_alt.PhoneUtils
 import com.klinker.android.send_message.Message
 import com.klinker.android.send_message.Settings
 import com.klinker.android.send_message.Transaction
@@ -17,14 +20,17 @@ import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.data.local.db.datastore.UserPreferences
 import com.sosauce.cinnamon.data.system.receivers.CuteMmsSentReceiver
 import com.sosauce.cinnamon.data.system.receivers.DeliveryReportsReceiver
+import com.sosauce.cinnamon.data.telephony.PhoneNumberNormalizer
 import com.sosauce.cinnamon.utils.getThreadIdOrCreate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class CuteTelephonyManager(
     private val context: Context,
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    private val phoneNumberNormalizer: PhoneNumberNormalizer
 ) {
 
 
@@ -59,39 +65,40 @@ class CuteTelephonyManager(
         attachments: List<Uri>
     ) {
 
-        val normalizedAddresses = addresses.mapNotNull { rawAddress ->
-            phoneNumberNormalizer.normalize(rawAddress)
-        }.distinct()
+
+        val normalizedAddresses = addresses.fastMap {
+            phoneNumberNormalizer.formatToE164(it)
+        }
 
         val isMms =
-            attachments.isNotEmpty() || (addresses.size > 1 && userPreferences.groupAsMms.first()) || (message.length > 160 && userPreferences.longAsMms.first())
+            attachments.isNotEmpty() || (normalizedAddresses.size > 1 && userPreferences.groupAsMms.first()) || (message.length > 160 && userPreferences.longAsMms.first())
 
         if (isMms) {
             if (attachments.isNotEmpty()) {
                 // one by one to limit risks of reaching carrier size limit
                 attachments.fastForEachIndexed { index, attachment ->
                     sendMms(
-                        addresses = addresses,
+                        addresses = normalizedAddresses,
                         message = if (index == attachments.lastIndex) message else "",
                         attachment = attachment
                     )
                 }
             } else {
                 sendMms(
-                    addresses = addresses,
+                    addresses = normalizedAddresses,
                     message = message,
                     attachment = null
                 )
             }
         } else {
-            addresses.fastForEach { address ->
+            normalizedAddresses.fastForEach { address ->
                 sendSms(address, message)
             }
         }
 
     }
 
-    // TODO, check if saved default sim is still active, if not, set back to default device sim
+    // TODO, check if saved default sim is still active, if not, set back to default device sim?
     private suspend fun sendSms(
         address: String,
         message: String

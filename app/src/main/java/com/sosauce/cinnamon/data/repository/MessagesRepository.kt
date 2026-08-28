@@ -6,15 +6,18 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.BlockedNumberContract
+import android.provider.ContactsContract.PhoneLookup
 import android.provider.Telephony
 import android.provider.Telephony.Mms
 import android.provider.Telephony.MmsSms
 import androidx.compose.ui.util.fastMap
 import androidx.core.net.toUri
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.domain.model.CuteConversation
+import com.sosauce.cinnamon.data.model.CuteConversationDto
+import com.sosauce.cinnamon.data.model.toCuteConversation
+import com.sosauce.cinnamon.presentation.screens.messages.CuteConversationUI
+import com.sosauce.cinnamon.presentation.screens.messages.Participant
 import com.sosauce.cinnamon.utils.beautifyNumber
-import com.sosauce.cinnamon.utils.getContactNameOrNothing
 import com.sosauce.cinnamon.utils.observe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
+import kotlin.text.isEmpty
 
 
 class MessagesRepository(private val context: Context) {
@@ -30,7 +34,7 @@ class MessagesRepository(private val context: Context) {
     fun fetchLatestConversations(
         extraSelection: String? = null,
         extraSelectionArgs: Array<String> = emptyArray()
-    ): Flow<List<CuteConversation>> {
+    ): Flow<List<CuteConversationDto>> {
         return context.contentResolver.observe(Telephony.Threads.CONTENT_URI).mapLatest {
             fetchConversations(extraSelection, extraSelectionArgs)
         }.flowOn(Dispatchers.IO)
@@ -40,16 +44,18 @@ class MessagesRepository(private val context: Context) {
     private fun fetchConversations(
         extraSelection: String?,
         extraSelectionArgs: Array<String>
-    ): List<CuteConversation> {
-        val conversations = mutableListOf<CuteConversation>()
+    ): List<CuteConversationDto> {
+        val conversations = mutableListOf<CuteConversationDto>()
 
         val projection = arrayOf(
             Telephony.Threads._ID,
             Telephony.Threads.SNIPPET,
             Telephony.Threads.DATE,
             Telephony.Threads.READ,
-            Telephony.Threads.RECIPIENT_IDS
+            Telephony.Threads.RECIPIENT_IDS,
         )
+
+        Telephony.Sms.Draft.CONTENT_URI
 
         val selection = buildString {
             append("${Telephony.Threads.MESSAGE_COUNT} > ?")
@@ -67,7 +73,6 @@ class MessagesRepository(private val context: Context) {
         }.toTypedArray()
 
 
-        val blockedNumbers = getAllBlockedNumbers()
 
 
         context.contentResolver.query(
@@ -89,31 +94,21 @@ class MessagesRepository(private val context: Context) {
                 val date = cursor.getLong(dateColumn)
                 val read = cursor.getInt(readColumn) != 0
                 val rawRecipients = recipientIds.fastMap { it.getNumberForId() }
-                val recipients =
-                    rawRecipients.fastMap { it.getContactNameOrNothing(context).beautifyNumber() }
-                val isGroupChat = rawRecipients.size > 1
                 val systemSnippet = cursor.getString(snippetColumn)
                 val snippet = if (systemSnippet.isNullOrBlank()) {
                     getMmsThreadSnippet(threadId)
                 } else {
                     systemSnippet
                 }
-
-
-
+                val participants = rawRecipients.fastMap { getParticipantDetails(it) }
 
                 conversations.add(
-                    CuteConversation(
+                    CuteConversationDto(
                         threadId = threadId,
-                        rawRecipients = rawRecipients,
-                        recipients = recipients,
+                        participants = participants,
                         snippet = snippet,
                         date = date,
-                        read = read,
-                        isGroupChat = isGroupChat,
-                        isSenderBlocked = if (isGroupChat) false else blockedNumbers.contains(
-                            rawRecipients.firstOrNull()
-                        )
+                        read = read
                     )
                 )
             }
@@ -123,32 +118,61 @@ class MessagesRepository(private val context: Context) {
     }
 
 
-    /**
-     * I don't wanna use [BlockedNumberContract.isBlocked] because they say it's slow and that's spooky
-     */
-    private fun getAllBlockedNumbers(): Set<String> {
+    private fun getParticipantDetails(number: String): Participant {
+        if (number.isEmpty()) return Participant(
+            rawNumber = number,
+            displayName = "<unknown>",
+            photoUriString = null,
+            isBlocked = false
+        )
 
-        val blocked = mutableSetOf<String>()
+        val uri = Uri.withAppendedPath(
+            PhoneLookup.CONTENT_FILTER_URI,
+            Uri.encode(number)
+        )
+
+        val projection = arrayOf(
+            PhoneLookup.DISPLAY_NAME,
+            PhoneLookup.PHOTO_THUMBNAIL_URI
+        )
+
+        val isBlocked = if (BlockedNumberContract.canCurrentUserBlockNumbers(context)) {
+            BlockedNumberContract.isBlocked(context, number)
+        } else false
 
         context.contentResolver.query(
-            BlockedNumberContract.BlockedNumbers.CONTENT_URI,
-            arrayOf(BlockedNumberContract.BlockedNumbers.COLUMN_ORIGINAL_NUMBER),
-            null,
+            uri,
+            projection,
             null,
             null
         )?.use { cursor ->
-            val numberColumn =
-                cursor.getColumnIndexOrThrow(BlockedNumberContract.BlockedNumbers.COLUMN_ORIGINAL_NUMBER)
 
-            while (cursor.moveToNext()) {
-                val number = cursor.getString(numberColumn)
-                blocked.add(number)
+            val displayNameColumn = cursor.getColumnIndexOrThrow(PhoneLookup.DISPLAY_NAME)
+            val photoThumbnailColumn = cursor.getColumnIndexOrThrow(PhoneLookup.PHOTO_THUMBNAIL_URI)
+
+            if (cursor.moveToFirst()) {
+
+                val displayName = cursor.getString(displayNameColumn) ?: number.beautifyNumber()
+                val photoThumbnail = cursor.getString(photoThumbnailColumn)
+
+                val participant = Participant(
+                    rawNumber = number,
+                    displayName = displayName,
+                    photoUriString = photoThumbnail,
+                    isBlocked = isBlocked
+                )
+                return participant
             }
         }
 
-        return blocked
-
+        return Participant(
+            rawNumber = number,
+            displayName = number.beautifyNumber(),
+            photoUriString = null,
+            isBlocked = isBlocked
+        )
     }
+
 
     private fun String.getNumberForId(): String {
 

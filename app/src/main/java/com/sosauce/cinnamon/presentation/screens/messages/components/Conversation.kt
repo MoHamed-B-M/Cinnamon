@@ -6,17 +6,22 @@ import android.provider.BlockedNumberContract
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,20 +41,18 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastForEachIndexed
+import coil3.compose.AsyncImage
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.domain.model.CuteConversation
-import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
 import com.sosauce.cinnamon.presentation.components.DefaultGroupChatIcon
 import com.sosauce.cinnamon.presentation.components.items.CuteListItem
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationsAction
-import com.sosauce.cinnamon.utils.toDate
+import com.sosauce.cinnamon.presentation.screens.messages.CuteConversationUI
 import com.sosauce.nekobites.components.AnimatedSelectedIcon
 
 @Composable
 fun SharedTransitionScope.Conversation(
     modifier: Modifier = Modifier,
-    conversation: CuteConversation,
+    conversation: CuteConversationUI,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
     isSelected: Boolean = false,
@@ -63,6 +67,10 @@ fun SharedTransitionScope.Conversation(
 
 
     if (showUnblockDialog) {
+
+        // Can only block individual chats, not group chats
+        val blockedParticipant = conversation.participants.first()
+
         AlertDialog(
             onDismissRequest = { showUnblockDialog = false },
             icon = {
@@ -76,7 +84,7 @@ fun SharedTransitionScope.Conversation(
                     onClick = {
                         BlockedNumberContract.unblock(
                             context,
-                            conversation.rawRecipients.firstOrNull()
+                            blockedParticipant.rawNumber
                         )
                         showUnblockDialog = false
                     },
@@ -101,7 +109,7 @@ fun SharedTransitionScope.Conversation(
                 Text(
                     text = stringResource(
                         R.string.unblock_no_u_sure,
-                        conversation.recipients.first()
+                        blockedParticipant.displayName
                     )
                 )
             },
@@ -128,10 +136,7 @@ fun SharedTransitionScope.Conversation(
                 if (conversation.isGroupChat) {
                     DefaultGroupChatIcon()
                 } else {
-                    DefaultContactIcon(
-                        firstLetter = conversation.recipients.firstOrNull()?.firstOrNull(),
-                        contactPhoneNumber = conversation.rawRecipients.firstOrNull()
-                    )
+                    ConversationIcon(conversation)
                 }
             }
         },
@@ -141,7 +146,7 @@ fun SharedTransitionScope.Conversation(
                 modifier = Modifier.padding(end = 5.dp)
             ) {
 
-                if (conversation.isSenderBlocked) {
+                if (conversation.isAnyBlocked && !conversation.isGroupChat) {
                     IconButton(
                         onClick = { showUnblockDialog = true }
                     ) {
@@ -152,7 +157,7 @@ fun SharedTransitionScope.Conversation(
                     }
                 } else {
                     Text(
-                        text = conversation.date.toDate(),
+                        text = conversation.date,
                         style = MaterialTheme.typography.bodySmallEmphasized.copy(
                             color = if (conversation.read) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onBackground
                         )
@@ -171,20 +176,13 @@ fun SharedTransitionScope.Conversation(
         }
     ) {
         Text(
-            text = buildString {
-                conversation.recipients.fastForEachIndexed { index, text ->
-                    append(text)
-                    if (index != conversation.recipients.lastIndex) {
-                        append(", ")
-                    }
-                }
-            },
+            text = conversation.name,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
 
         val text = when {
-            conversation.isSenderBlocked -> {
+            conversation.isAnyBlocked && !conversation.isGroupChat -> {
                 buildAnnotatedString {
                     withStyle(
                         SpanStyle(

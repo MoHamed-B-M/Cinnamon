@@ -171,6 +171,7 @@ fun Nav(
 
                         ConversationsScreen(
                             state = state,
+                            textFieldState = viewModel.textFieldState,
                             onNavigate = backStack::add,
                             onHandleConversationsAction = viewModel::handleThreadsAction
                         )

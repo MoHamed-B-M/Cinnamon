@@ -14,12 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.domain.model.CuteConversation
 import com.sosauce.cinnamon.presentation.components.ConversationsSelectedBar
 import com.sosauce.cinnamon.presentation.components.buttons.CuteNavigationButtonSurface
 import com.sosauce.cinnamon.presentation.components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.presentation.navigation.Screen
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationsAction
+import com.sosauce.cinnamon.presentation.screens.messages.CuteConversationUI
 import com.sosauce.cinnamon.presentation.screens.messages.components.dialogs.DeleteConversationsDialog
 import com.sosauce.cinnamon.presentation.screens.messages.threadsList
 import com.sosauce.cinnamon.utils.selfAlignHorizontally
@@ -34,7 +34,7 @@ fun SharedTransitionScope.ArchivedThreads(
     onHandleThreadsAction: (ConversationsAction) -> Unit
 ) {
 
-    val sweetSelectState = rememberSweetSelectState<CuteConversation>()
+    val sweetSelectState = rememberSweetSelectState<CuteConversationUI>()
     var showDeleteConversationsDialog by remember { mutableStateOf(false) }
 
     if (showDeleteConversationsDialog) {
@@ -92,8 +92,8 @@ fun SharedTransitionScope.ArchivedThreads(
             contentPadding = paddingValues
         ) {
             threadsList(
-                pinnedThreads = emptyList(),
-                threads = state.threads,
+                pinnedConversations = emptyList(),
+                conversations = state.threads,
                 sweetSelectState = sweetSelectState,
                 onNavigate = onNavigate,
                 sharedTransitionScope = this@ArchivedThreads,

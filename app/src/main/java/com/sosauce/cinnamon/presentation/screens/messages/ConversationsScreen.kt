@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,7 +36,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.data.local.db.datastore.rememberSortConversationsAscending
-import com.sosauce.cinnamon.domain.model.CuteConversation
 import com.sosauce.cinnamon.presentation.components.ConversationsSelectedBar
 import com.sosauce.cinnamon.presentation.components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.presentation.navigation.Screen
@@ -51,11 +51,12 @@ import com.sosauce.sweetselect.rememberSweetSelectState
 @Composable
 fun SharedTransitionScope.ConversationsScreen(
     state: ConversationsState,
+    textFieldState: TextFieldState,
     onNavigate: (Screen) -> Unit,
     onHandleConversationsAction: (ConversationsAction) -> Unit
 ) {
     val listState = rememberLazyListState()
-    val sweetSelectState = rememberSweetSelectState<CuteConversation>()
+    val sweetSelectState = rememberSweetSelectState<CuteConversationUI>()
     var sortConversationsAscending by rememberSortConversationsAscending()
 
     if (state.isLoading) {
@@ -75,7 +76,7 @@ fun SharedTransitionScope.ConversationsScreen(
                         CuteSearchbar(
                             modifier = Modifier.selfAlignHorizontally(),
                             sortingMenu = {},
-                            textFieldState = state.textFieldState,
+                            textFieldState = textFieldState,
                             fab = {
                                 AnimatedFab(
                                     onClick = { onNavigate(Screen.StartConversation) },
@@ -148,8 +149,8 @@ fun SharedTransitionScope.ConversationsScreen(
                 }
 
                 threadsList(
-                    pinnedThreads = state.pinnedConversations,
-                    threads = state.conversations,
+                    pinnedConversations = state.pinnedConversations,
+                    conversations = state.conversations,
                     sweetSelectState = sweetSelectState,
                     onNavigate = onNavigate,
                     sharedTransitionScope = this@ConversationsScreen,
@@ -168,9 +169,9 @@ fun SharedTransitionScope.ConversationsScreen(
 }
 
 fun LazyListScope.threadsList(
-    pinnedThreads: List<CuteConversation>,
-    threads: List<CuteConversation>,
-    sweetSelectState: SweetSelectState<CuteConversation>,
+    pinnedConversations: List<CuteConversationUI>,
+    conversations: List<CuteConversationUI>,
+    sweetSelectState: SweetSelectState<CuteConversationUI>,
     onNavigate: (Screen) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     emptyState: @Composable () -> Unit,
@@ -179,7 +180,7 @@ fun LazyListScope.threadsList(
     item(LazyListKeys.PINNED_CONVERSATIONS) {
         LazyRow(modifier = Modifier.fillMaxWidth()) {
             items(
-                items = pinnedThreads,
+                items = pinnedConversations,
                 key = { it.threadId }
             ) { conversation ->
 
@@ -188,7 +189,7 @@ fun LazyListScope.threadsList(
                 }
 
                 PinnedConversation(
-                    cuteConversation = conversation,
+                    conversation = conversation,
                     isSelected = isSelected,
                     onClick = {
                         if (sweetSelectState.isInSelectionMode) {
@@ -205,7 +206,7 @@ fun LazyListScope.threadsList(
 
     with(sharedTransitionScope) {
         items(
-            items = threads,
+            items = conversations,
             key = { conversation -> conversation.threadId }
         ) { conversation ->
 
@@ -228,7 +229,7 @@ fun LazyListScope.threadsList(
             )
         }
     }
-    if (threads.isEmpty() && pinnedThreads.isEmpty()) {
+    if (conversations.isEmpty() && pinnedConversations.isEmpty()) {
         item { emptyState() }
     }
 }

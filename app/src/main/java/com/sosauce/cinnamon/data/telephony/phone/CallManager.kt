@@ -5,7 +5,9 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.telecom.TelecomManager
+import androidx.core.net.toUri
 import com.sosauce.cinnamon.data.local.db.datastore.UserPreferences
+import com.sosauce.cinnamon.data.telephony.PhoneNumberNormalizer
 import com.sosauce.cinnamon.domain.model.AudioRoute
 import com.sosauce.cinnamon.domain.model.CuteSimCard
 import com.sosauce.cinnamon.presentation.screens.messages.CallState
@@ -25,8 +27,9 @@ import kotlinx.coroutines.runBlocking
  */
 class CallManager(
     private val context: Context,
-    val telecomManager: TelecomManager,
-    private val userPreferences: UserPreferences
+    private val telecomManager: TelecomManager,
+    private val userPreferences: UserPreferences,
+    private val phoneNumberNormalizer: PhoneNumberNormalizer
 ) {
 
     private var callServiceCallback: CallServiceCallback? = null
@@ -57,8 +60,10 @@ class CallManager(
 
     fun declineCall() = androidCallCallback?.declineCall()
 
-    @SuppressLint("MissingPermission")
-    fun startCall(number: Uri) {
+    /**
+     * @return Whether the call was successfully placed or not
+     */
+    fun startCall(number: String): Boolean {
 
         val phoneHandle = runBlocking { userPreferences.getDefaultPhoneHandle().first() }
 
@@ -66,7 +71,15 @@ class CallManager(
             putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, phoneHandle)
         }
 
-        telecomManager.placeCall(number, bundle)
+        val normalizedNumber = phoneNumberNormalizer.formatToE164(number)
+        val numberUri = "tel:$normalizedNumber".toUri()
+
+        return try {
+            telecomManager.placeCall(numberUri, bundle)
+            true
+        } catch (_: SecurityException) {
+            false
+        }
     }
 
 
@@ -128,6 +141,14 @@ class CallManager(
     fun updateActiveSim(sim: CuteSimCard) {
         _callingState.update {
             it.copy(activeSim = sim)
+        }
+    }
+
+    fun isInCall(): Boolean {
+        return try {
+            telecomManager.isInCall
+        } catch (_: SecurityException) {
+            false
         }
     }
 }

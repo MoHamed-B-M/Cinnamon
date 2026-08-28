@@ -2,6 +2,7 @@ package com.sosauce.cinnamon.presentation.navigation
 
 import androidx.navigation3.runtime.NavKey
 import com.sosauce.cinnamon.domain.model.CuteContact
+import com.sosauce.cinnamon.presentation.screens.messages.CuteConversationUI
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -68,7 +69,8 @@ sealed class Screen : NavKey {
 
     @Serializable
     data class Conversation(
-        val threadId: Long,
+        //val threadId: Long,
+        val conversation: CuteConversationUI,
         val prefilledMessage: String = ""
     ) : Screen()
 

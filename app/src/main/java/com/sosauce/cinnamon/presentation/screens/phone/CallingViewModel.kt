@@ -42,14 +42,11 @@ class CallingViewModel(
         }
     }
 
-    @SuppressLint("MissingPermission")
     fun handleCallAction(action: CallAction) {
         when (action) {
             is CallAction.LaunchCall -> {
-                val numberUri = "tel:${action.number}".toUri()
-
-                if (!callManager.telecomManager.isInCall) {
-                    callManager.startCall(numberUri)
+                if (!callManager.isInCall()) {
+                    callManager.startCall(action.number)
                 }
             }
 
@@ -92,4 +89,8 @@ sealed interface CallAction {
     data object DeclineCall : CallAction
     data object ToggleHold : CallAction
     data object HangUp : CallAction
+}
+
+sealed interface CallEvents {
+
 }

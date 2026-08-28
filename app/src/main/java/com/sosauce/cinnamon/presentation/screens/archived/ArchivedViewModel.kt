@@ -3,12 +3,14 @@
 package com.sosauce.cinnamon.presentation.screens.archived
 
 import android.provider.Telephony
+import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sosauce.cinnamon.data.local.db.datastore.UserPreferences
+import com.sosauce.cinnamon.data.model.toCuteConversation
 import com.sosauce.cinnamon.data.repository.MessagesRepository
-import com.sosauce.cinnamon.domain.model.CuteConversation
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationsAction
+import com.sosauce.cinnamon.presentation.screens.messages.CuteConversationUI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,11 +46,10 @@ class ArchivedViewModel(
                     }
 
                 }.collectLatest { threads ->
-                    println("archived: $threads")
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            threads = threads
+                            threads = threads.fastMap { it.toCuteConversation("") }
                         )
                     }
                 }
@@ -77,13 +78,10 @@ class ArchivedViewModel(
         }
     }
 
-    companion object {
-        private const val ARCHIVED_SELECTION = "${Telephony.Threads._ID} = ?"
-    }
 
 }
 
 data class ArchivedState(
     val isLoading: Boolean = false,
-    val threads: List<CuteConversation> = emptyList()
+    val threads: List<CuteConversationUI> = emptyList()
 )

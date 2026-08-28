@@ -2,6 +2,7 @@ package com.sosauce.cinnamon.di
 
 import android.content.Context
 import android.telecom.TelecomManager
+import android.telephony.TelephonyManager
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.sosauce.cinnamon.data.local.db.datastore.UserPreferences
@@ -17,6 +18,7 @@ import com.sosauce.cinnamon.data.repository.DialerRepository
 import com.sosauce.cinnamon.data.repository.MessagesRepository
 import com.sosauce.cinnamon.data.repository.SimsRepository
 import com.sosauce.cinnamon.data.repository.VoicemailsRepository
+import com.sosauce.cinnamon.data.telephony.PhoneNumberNormalizer
 import com.sosauce.cinnamon.data.telephony.message.CuteTelephonyManager
 import com.sosauce.cinnamon.data.telephony.message.MessageNotificationManager
 import com.sosauce.cinnamon.data.telephony.phone.CallManager
@@ -74,6 +76,15 @@ val appModule = module {
 
     single<TelecomManager> {
         androidContext().getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+    }
+    single<TelephonyManager> {
+        androidContext().getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+    }
+
+    single {
+        PhoneNumberNormalizer(
+            telephonyManager = get()
+        )
     }
 
     singleOf(::UserPreferences)

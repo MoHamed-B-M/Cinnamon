@@ -2,107 +2,64 @@
 
 package com.sosauce.cinnamon.presentation.screens.messages
 
-import android.app.Application
-import android.provider.BlockedNumberContract
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastMap
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sosauce.cinnamon.data.local.db.datastore.UserPreferences
 import com.sosauce.cinnamon.data.local.db.room.conversationSettings.ConversationSettingsDao
+import com.sosauce.cinnamon.data.model.toCuteConversation
 import com.sosauce.cinnamon.data.repository.MessagesRepository
-import com.sosauce.cinnamon.domain.model.CuteConversation
-import com.sosauce.cinnamon.utils.observe
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import kotlin.time.Duration.Companion.milliseconds
 
 class ConversationsViewModel(
-    private val application: Application,
     private val messagesRepository: MessagesRepository,
     private val userPreferences: UserPreferences,
     private val conversationSettingsDao: ConversationSettingsDao
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
-    private val _state = MutableStateFlow(ConversationsState(isLoading = true))
-    val state = _state.asStateFlow()
+    val state = combine(
+        messagesRepository.fetchLatestConversations(),
+        userPreferences.pinnedConversations,
+        conversationSettingsDao.getAllDrafts(),
+        userPreferences.archivedConversations,
+        snapshotFlow { textFieldState.text }.debounce(250.milliseconds)
+    ) { cleanConversations, pinned, allDrafts, archived, searchQuery ->
+        val (pinnedThreads, unpinnedThreads) = cleanConversations
+            .fastFilter { it.threadId.toString() !in archived }
+            .fastFilter {
+                it.snippet.contains(searchQuery, true) ||
+                        it.participants.fastAny { it.displayName.contains(searchQuery, true) }
+            }
+            .fastMap {
+                val draft = allDrafts[it.threadId] ?: ""
+                it.toCuteConversation(draft)
+            }
+            .partition { it.threadId.toString() in pinned }
 
-    private val textFieldState = TextFieldState()
+        ConversationsState(
+            isLoading = false,
+            conversations = unpinnedThreads,
+            pinnedConversations = pinnedThreads,
+            hasArchivedThreads = archived.isNotEmpty()
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        ConversationsState(isLoading = true)
+    )
 
-
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            combine(
-                messagesRepository.fetchLatestConversations(),
-                userPreferences.pinnedConversations,
-                conversationSettingsDao.getAllDrafts(),
-                userPreferences.archivedConversations,
-                snapshotFlow { textFieldState.text }.debounce(250.milliseconds)
-            ) { cleanConversations, pinned, allDrafts, archived, searchQuery ->
-                val (pinnedThreads, unpinnedThreads) = cleanConversations
-                    .fastFilter { it.threadId.toString() !in archived }
-                    .fastFilter {
-                        it.snippet.contains(searchQuery, true)
-                    }
-                    .fastMap {
-                        val draft = allDrafts[it.threadId] ?: ""
-                        it.copy(draft = draft)
-                    }
-                    .partition { it.threadId.toString() in pinned }
-
-                ConversationsState(
-                    isLoading = false,
-                    conversations = unpinnedThreads,
-                    pinnedConversations = pinnedThreads,
-                    hasArchivedThreads = archived.isNotEmpty(),
-                    textFieldState = textFieldState
-                )
-            }.collectLatest { newState -> _state.update { newState } }
-        }
-
-        viewModelScope.launch {
-            application.contentResolver.observe(BlockedNumberContract.BlockedNumbers.CONTENT_URI)
-                .onEach {
-
-                    val newConversations = state.value.conversations.fastMap {
-                        if (it.isGroupChat) {
-                            it
-                        } else {
-                            val recipient = it.rawRecipients.firstOrNull()
-                            if (recipient == null) {
-                                it
-                            } else {
-                                it.copy(
-                                    isSenderBlocked = BlockedNumberContract.isBlocked(
-                                        application,
-                                        recipient
-                                    )
-                                )
-                            }
-                        }
-                    }
-
-                    _state.update {
-                        it.copy(
-                            conversations = newConversations
-                        )
-                    }
-                }.launchIn(viewModelScope + Dispatchers.IO)
-        }
-    }
+    val textFieldState = TextFieldState()
 
     fun handleThreadsAction(action: ConversationsAction) {
         when (action) {
@@ -133,9 +90,8 @@ class ConversationsViewModel(
 data class ConversationsState(
     val isLoading: Boolean = false,
     val hasArchivedThreads: Boolean = false,
-    val conversations: List<CuteConversation> = emptyList(),
-    val pinnedConversations: List<CuteConversation> = emptyList(),
-    val textFieldState: TextFieldState = TextFieldState()
+    val conversations: List<CuteConversationUI> = emptyList(),
+    val pinnedConversations: List<CuteConversationUI> = emptyList()
 )
 
 sealed interface ConversationsAction {

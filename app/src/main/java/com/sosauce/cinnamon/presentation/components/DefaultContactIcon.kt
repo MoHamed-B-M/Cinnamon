@@ -80,8 +80,6 @@ fun DefaultContactIcon(
             contentScale = ContentScale.Crop
         )
     }
-
-
 }
 
 @Composable

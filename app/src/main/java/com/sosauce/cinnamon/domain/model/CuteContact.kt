@@ -38,10 +38,10 @@ data class CuteContact(
 ) {
 
 
-    val hasInfos =
-        details.phoneNumbers.isNotEmpty() || details.emails.isNotEmpty() || details.addresses.isNotEmpty()
-    val hasAbout =
-        details.websites.isNotEmpty() || details.note?.isNotEmpty() == true || details.events.isNotEmpty()
+    val hasInfos
+        get() = details.phoneNumbers.isNotEmpty() || details.emails.isNotEmpty() || details.addresses.isNotEmpty()
+    val hasAbout
+        get() = details.websites.isNotEmpty() || details.note?.isNotEmpty() == true || details.events.isNotEmpty()
 
     val searchIndex: String by lazy {
         buildString {
