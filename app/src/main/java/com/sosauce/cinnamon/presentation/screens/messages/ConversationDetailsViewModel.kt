@@ -59,8 +59,7 @@ class ConversationDetailsViewModel(
     private val messageNotificationManager: MessageNotificationManager
 ) : AndroidViewModel(application) {
 
-    private val _state =
-        MutableStateFlow(ConversationDetailsState(isLoading = true, threadId = threadId))
+    private val _state = MutableStateFlow(ConversationDetailsState(isLoading = true, threadId = threadId))
     val state = _state.asStateFlow()
 
     init {
@@ -300,5 +299,4 @@ sealed interface ConversationActions {
     data class DeleteSelectedMessages(
         val messages: List<CuteMessage>
     ) : ConversationActions
-
 }

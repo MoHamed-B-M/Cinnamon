@@ -69,8 +69,7 @@ sealed class Screen : NavKey {
 
     @Serializable
     data class Conversation(
-        //val threadId: Long,
-        val conversation: CuteConversationUI,
+        val threadId: Long,
         val prefilledMessage: String = ""
     ) : Screen()
 
