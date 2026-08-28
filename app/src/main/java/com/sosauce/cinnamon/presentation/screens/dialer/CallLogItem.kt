@@ -42,17 +42,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.domain.model.CuteCallLog
+import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
+import com.sosauce.cinnamon.presentation.components.items.CuteListItem
 import com.sosauce.cinnamon.presentation.navigation.Screen
 import com.sosauce.cinnamon.presentation.screens.phone.CallAction
-import com.sosauce.cinnamon.presentation.shared_components.DefaultContactIcon
-import com.sosauce.cinnamon.presentation.shared_components.animations.AnimatedMoreIcon
-import com.sosauce.cinnamon.presentation.shared_components.animations.AnimatedSelectedIcon
-import com.sosauce.cinnamon.presentation.shared_components.items.CuteListItem
 import com.sosauce.cinnamon.utils.beautifyNumber
 import com.sosauce.cinnamon.utils.getItemShape
 import com.sosauce.cinnamon.utils.getThreadIdOrCreate
 import com.sosauce.cinnamon.utils.secondsToDuration
 import com.sosauce.cinnamon.utils.toTime
+import com.sosauce.nekobites.animations.AnimatedDrawable
+import com.sosauce.nekobites.animations.AnimatedDrawableFile
+import com.sosauce.nekobites.components.AnimatedSelectedIcon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -168,7 +169,10 @@ fun CallLogItem(
                     onClick = { showMoreOptions = true },
                     shapes = IconButtonDefaults.shapes()
                 ) {
-                    AnimatedMoreIcon(showMoreOptions)
+                    AnimatedDrawable(
+                        drawable = AnimatedDrawableFile.MORE_VERT,
+                        atEnd = showMoreOptions
+                    )
                 }
 
                 DropdownMenuPopup(

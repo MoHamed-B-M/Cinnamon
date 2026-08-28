@@ -32,10 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.domain.model.CuteContact
+import com.sosauce.cinnamon.presentation.components.items.CuteListItem
+import com.sosauce.cinnamon.presentation.components.text.HeaderText
 import com.sosauce.cinnamon.presentation.navigation.Screen
 import com.sosauce.cinnamon.presentation.screens.phone.CallAction
-import com.sosauce.cinnamon.presentation.shared_components.items.CuteListItem
-import com.sosauce.cinnamon.presentation.shared_components.text.HeaderText
 import com.sosauce.cinnamon.utils.formateEventDate
 
 @Composable

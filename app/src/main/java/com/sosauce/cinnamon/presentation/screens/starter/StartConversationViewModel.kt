@@ -8,8 +8,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.util.fastFilter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sosauce.cinnamon.data.repository.ContactsRepository
 import com.sosauce.cinnamon.domain.model.CuteContact
-import com.sosauce.cinnamon.domain.repository.ContactsRepository
 import com.sosauce.cinnamon.utils.copyMutate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

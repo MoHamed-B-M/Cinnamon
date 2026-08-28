@@ -1,7 +1,7 @@
 package com.sosauce.cinnamon.domain.model
 
 import android.provider.Telephony.Sms
-import com.sosauce.cinnamon.data.broadcasts.DeliveryReportsReceiver
+import com.sosauce.cinnamon.data.system.receivers.DeliveryReportsReceiver
 
 /**
  * Define what a message is.

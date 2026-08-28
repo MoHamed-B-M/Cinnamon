@@ -24,6 +24,8 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,18 +36,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.conversation_settings.ConversationSettingActions
-import com.sosauce.cinnamon.presentation.shared_components.CategoryCard
-import com.sosauce.cinnamon.presentation.shared_components.ImagePickerCard
-import com.sosauce.cinnamon.presentation.shared_components.buttons.CuteNavigationButton
-import com.sosauce.cinnamon.presentation.shared_components.buttons.WavySlider
-import com.sosauce.cinnamon.presentation.shared_components.text.HeaderText
+import com.sosauce.cinnamon.data.local.db.room.conversationSettings.ConversationSettingActions
+import com.sosauce.cinnamon.presentation.components.CategoryCard
+import com.sosauce.cinnamon.presentation.components.ImagePickerCard
+import com.sosauce.cinnamon.presentation.components.buttons.CuteNavigationButton
+import com.sosauce.cinnamon.presentation.components.buttons.WavySlider
+import com.sosauce.cinnamon.presentation.components.text.HeaderText
 import com.sosauce.cinnamon.utils.selfAlignHorizontally
+import com.sosauce.nekobites.components.ColorPickerDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -93,14 +97,35 @@ fun ConversationTheming(
     if (showColorPicker) {
         ColorPickerDialog(
             onDismissRequest = { showColorPicker = false },
-            onAddNewColor = { color ->
-                onHandleConversationSettingsActions(
-                    ConversationSettingActions.UpsertConversationSettings(
-                        state.settings.copy(
-                            color = color
-                        )
-                    )
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.colorize),
+                    contentDescription = null
                 )
+            },
+            title = { Text(stringResource(R.string.color_picker)) },
+            dismissButton = {
+                TextButton(
+                    onClick = { showColorPicker = false }
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+            confirmButton = { newColor ->
+                TextButton(
+                    onClick = {
+                        onHandleConversationSettingsActions(
+                            ConversationSettingActions.UpsertConversationSettings(
+                                state.settings.copy(
+                                    color = newColor.toArgb()
+                                )
+                            )
+                        )
+                        showColorPicker = false
+                    }
+                ) {
+                    Text(stringResource(R.string.save))
+                }
             }
         )
     }

@@ -7,8 +7,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.util.fastFilter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sosauce.cinnamon.data.repository.VoicemailsRepository
 import com.sosauce.cinnamon.domain.model.CuteVoicemail
-import com.sosauce.cinnamon.domain.repository.VoicemailsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow

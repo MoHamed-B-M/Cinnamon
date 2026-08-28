@@ -14,12 +14,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ContainedLoadingIndicator
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,18 +29,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
-import com.skydoves.cloudy.cloudy
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.datastore.rememberSortContactsAscending
+import com.sosauce.cinnamon.data.local.db.datastore.rememberSortContactsAscending
 import com.sosauce.cinnamon.domain.model.CuteContact
+import com.sosauce.cinnamon.presentation.components.ContactsSelectedBar
+import com.sosauce.cinnamon.presentation.components.menus.SortingDropdownMenu
+import com.sosauce.cinnamon.presentation.components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.presentation.navigation.Screen
-import com.sosauce.cinnamon.presentation.shared_components.ContactsSelectedBar
-import com.sosauce.cinnamon.presentation.shared_components.NoXFound
-import com.sosauce.cinnamon.presentation.shared_components.animations.AnimatedFab
-import com.sosauce.cinnamon.presentation.shared_components.menus.SortingDropdownMenu
-import com.sosauce.cinnamon.presentation.shared_components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.utils.LazyListKeys
 import com.sosauce.cinnamon.utils.selfAlignHorizontally
+import com.sosauce.nekobites.animations.AnimatedFab
+import com.sosauce.nekobites.components.NoXFound
 import com.sosauce.sweetselect.rememberSweetSelectState
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -96,7 +95,7 @@ fun SharedTransitionScope.ContactsScreen(
                                     onChangeSorting = { sortContactsAscending = it }
                                 ) {
                                     state.accountsToCount.onEachIndexed { index, (account, count) ->
-                                        DropdownMenuItem(
+                                        SelectableDropdownMenuItem(
                                             selected = state.accountFilter == account,
                                             onClick = {
                                                 onHandleContactsAction(
@@ -116,7 +115,7 @@ fun SharedTransitionScope.ContactsScreen(
                                                 )
                                             },
                                             text = { Text(account) },
-                                            trailingIcon = { Text(count.toString()) }
+                                            trailingContent = { Text(count.toString()) }
                                         )
                                     }
                                 }

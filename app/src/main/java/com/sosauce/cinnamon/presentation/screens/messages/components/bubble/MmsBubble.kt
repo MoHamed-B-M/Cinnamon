@@ -36,8 +36,8 @@ import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.domain.model.AttachmentType
 import com.sosauce.cinnamon.domain.model.CuteAttachment
 import com.sosauce.cinnamon.domain.model.CuteMessage
+import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationActions
-import com.sosauce.cinnamon.presentation.shared_components.DefaultContactIcon
 import com.sosauce.cinnamon.utils.getVcfName
 import com.sosauce.cinnamon.utils.isVcard
 

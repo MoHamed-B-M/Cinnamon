@@ -3,9 +3,7 @@ package com.sosauce.cinnamon.presentation.screens.settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -14,19 +12,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.datastore.rememberDefaultMessagesSim
-import com.sosauce.cinnamon.data.datastore.rememberEnableDeliveryReports
-import com.sosauce.cinnamon.data.datastore.rememberSendGroupAsMms
-import com.sosauce.cinnamon.data.datastore.rememberSendLongAsMms
-import com.sosauce.cinnamon.data.datastore.rememberShowCharCount
+import com.sosauce.cinnamon.data.local.db.datastore.rememberDefaultMessagesSim
+import com.sosauce.cinnamon.data.local.db.datastore.rememberEnableDeliveryReports
+import com.sosauce.cinnamon.data.local.db.datastore.rememberSendGroupAsMms
+import com.sosauce.cinnamon.data.local.db.datastore.rememberSendLongAsMms
+import com.sosauce.cinnamon.data.local.db.datastore.rememberShowCharCount
+import com.sosauce.cinnamon.presentation.components.SimsViewModel
 import com.sosauce.cinnamon.presentation.screens.settings.components.LazyRowWithScrollButton
 import com.sosauce.cinnamon.presentation.screens.settings.components.SettingsWithTitle
 import com.sosauce.cinnamon.presentation.screens.settings.components.SimSelector
 import com.sosauce.cinnamon.presentation.screens.settings.components.SwitchSettingsCard
-import com.sosauce.cinnamon.presentation.shared_components.SimsViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

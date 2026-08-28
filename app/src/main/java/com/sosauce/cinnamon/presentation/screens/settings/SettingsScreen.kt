@@ -5,14 +5,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -25,10 +23,10 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.sosauce.cinnamon.R
+import com.sosauce.cinnamon.presentation.components.buttons.CuteNavigationButton
 import com.sosauce.cinnamon.presentation.navigation.SettingsScreens
 import com.sosauce.cinnamon.presentation.screens.settings.components.AboutCard
 import com.sosauce.cinnamon.presentation.screens.settings.components.SettingsCategoryCard
-import com.sosauce.cinnamon.presentation.shared_components.buttons.CuteNavigationButton
 import com.sosauce.cinnamon.utils.bouncySpecNavigation
 import com.sosauce.cinnamon.utils.navigateBack
 

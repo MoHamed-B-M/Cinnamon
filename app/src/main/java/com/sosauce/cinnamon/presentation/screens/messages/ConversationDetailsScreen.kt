@@ -62,8 +62,8 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import coil3.compose.AsyncImage
 import com.skydoves.cloudy.cloudy
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.conversation_settings.ConversationSettingActions
-import com.sosauce.cinnamon.data.managers.ActiveThreadId
+import com.sosauce.cinnamon.data.local.db.room.conversationSettings.ConversationSettingActions
+import com.sosauce.cinnamon.data.telephony.message.ActiveThreadId
 import com.sosauce.cinnamon.domain.model.CuteMessage
 import com.sosauce.cinnamon.presentation.navigation.Screen
 import com.sosauce.cinnamon.presentation.screens.messages.components.TextingUnavailableBar

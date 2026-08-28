@@ -2,11 +2,11 @@ package com.sosauce.cinnamon.presentation.screens.contacts.editor
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sosauce.cinnamon.data.contact_settings.ContactSettings
-import com.sosauce.cinnamon.data.contact_settings.ContactSettingsActions
-import com.sosauce.cinnamon.data.contact_settings.ContactSettingsDao
+import com.sosauce.cinnamon.data.local.db.room.contactSettings.ContactSettings
+import com.sosauce.cinnamon.data.local.db.room.contactSettings.ContactSettingsActions
+import com.sosauce.cinnamon.data.local.db.room.contactSettings.ContactSettingsDao
+import com.sosauce.cinnamon.data.repository.ContactsRepository
 import com.sosauce.cinnamon.domain.model.CuteContact
-import com.sosauce.cinnamon.domain.repository.ContactsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

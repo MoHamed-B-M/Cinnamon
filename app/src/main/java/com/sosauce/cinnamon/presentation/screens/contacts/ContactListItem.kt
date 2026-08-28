@@ -14,11 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.sosauce.cinnamon.domain.model.CuteContact
-import com.sosauce.cinnamon.presentation.shared_components.DefaultContactIcon
-import com.sosauce.cinnamon.presentation.shared_components.animations.AnimatedSelectedIcon
-import com.sosauce.cinnamon.presentation.shared_components.items.CuteListItem
+import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
+import com.sosauce.cinnamon.presentation.components.items.CuteListItem
 import com.sosauce.cinnamon.utils.SharedTransitionKeys
 import com.sosauce.cinnamon.utils.beautifyNumber
+import com.sosauce.nekobites.components.AnimatedSelectedIcon
 
 @Composable
 fun SharedTransitionScope.ContactListItem(

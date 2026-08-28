@@ -68,16 +68,17 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.skydoves.cloudy.cloudy
 import com.sosauce.cinnamon.R
+import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
+import com.sosauce.cinnamon.presentation.components.buttons.CuteNavigationButtonSurface
 import com.sosauce.cinnamon.presentation.navigation.Screen
 import com.sosauce.cinnamon.presentation.screens.contacts.components.ContactActionsRow
 import com.sosauce.cinnamon.presentation.screens.contacts.components.ContactInfos
 import com.sosauce.cinnamon.presentation.screens.messages.components.bottombar.MoreOptions
 import com.sosauce.cinnamon.presentation.screens.phone.CallAction
-import com.sosauce.cinnamon.presentation.shared_components.DefaultContactIcon
-import com.sosauce.cinnamon.presentation.shared_components.animations.AnimatedMoreIcon
-import com.sosauce.cinnamon.presentation.shared_components.buttons.CuteNavigationButtonSurface
 import com.sosauce.cinnamon.utils.SharedTransitionKeys
 import com.sosauce.cinnamon.utils.getItemShape
+import com.sosauce.nekobites.animations.AnimatedDrawable
+import com.sosauce.nekobites.animations.AnimatedDrawableFile
 
 @Composable
 fun SharedTransitionScope.ContactDetailsScreen(
@@ -264,7 +265,10 @@ fun SharedTransitionScope.ContactDetailsScreen(
                             onClick = { showMoreOptions = true },
                             shapes = IconButtonDefaults.shapes()
                         ) {
-                            AnimatedMoreIcon(showMoreOptions)
+                            AnimatedDrawable(
+                                atEnd = showMoreOptions,
+                                drawable = AnimatedDrawableFile.MORE_VERT
+                            )
                         }
                         DropdownMenuPopup(
                             expanded = showMoreOptions,

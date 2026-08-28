@@ -5,11 +5,11 @@ import android.app.Application
 import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.sosauce.cinnamon.data.contact_settings.ContactSettingsDao
-import com.sosauce.cinnamon.data.managers.CallManager
+import com.sosauce.cinnamon.data.local.db.room.contactSettings.ContactSettingsDao
+import com.sosauce.cinnamon.data.telephony.phone.CallManager
 import com.sosauce.cinnamon.domain.model.AudioRoute
 import com.sosauce.cinnamon.domain.model.CuteSimCard
-import com.sosauce.cinnamon.domain.states.CallState
+import com.sosauce.cinnamon.presentation.screens.messages.CallState
 import com.sosauce.cinnamon.utils.getContactId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update

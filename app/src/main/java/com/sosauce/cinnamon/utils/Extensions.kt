@@ -35,7 +35,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.material3.ColorScheme
@@ -65,7 +64,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.materialkolor.PaletteStyle
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.datastore.rememberIsLandscape
+import com.sosauce.cinnamon.data.local.db.datastore.rememberIsLandscape
 import com.sosauce.cinnamon.presentation.navigation.Screen
 import dev.chrisbanes.haze.HazeEffectScope
 import dev.chrisbanes.haze.HazeState
@@ -453,6 +452,7 @@ fun Context.createDefaultDialerIntent(): Intent {
         }
     }
 }
+
 fun Activity.requestRole(
     role: String // RoleManager.ROLE_SMS
 ) {

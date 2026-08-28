@@ -11,8 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import com.sosauce.cinnamon.data.datastore.rememberAppTheme
-import com.sosauce.cinnamon.data.datastore.rememberInitialTab
+import com.sosauce.cinnamon.data.local.db.datastore.rememberAppTheme
 import com.sosauce.cinnamon.presentation.navigation.Nav
 import com.sosauce.cinnamon.presentation.screens.setup.SetupScreen
 import com.sosauce.cinnamon.presentation.theme.CinnamonTheme

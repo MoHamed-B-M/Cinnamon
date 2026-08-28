@@ -30,7 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.domain.model.CuteMessage
-import com.sosauce.cinnamon.presentation.shared_components.DefaultContactIcon
+import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
 import com.sosauce.cinnamon.utils.bouncySpec
 import com.sosauce.cinnamon.utils.toTime
 

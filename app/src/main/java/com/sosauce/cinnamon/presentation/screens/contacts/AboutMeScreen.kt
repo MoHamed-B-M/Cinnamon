@@ -25,8 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.domain.model.AboutMe
-import com.sosauce.cinnamon.presentation.shared_components.DefaultContactIcon
-import com.sosauce.cinnamon.presentation.shared_components.buttons.CuteNavigationButton
+import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
+import com.sosauce.cinnamon.presentation.components.buttons.CuteNavigationButton
 import com.sosauce.cinnamon.utils.ICON_TEXT_SPACING
 
 @Composable

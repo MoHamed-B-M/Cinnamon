@@ -3,9 +3,7 @@ package com.sosauce.cinnamon.presentation.screens.settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -18,13 +16,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.datastore.rememberEnableT9Dialing
-import com.sosauce.cinnamon.data.datastore.rememberGroupSubsequentCalls
+import com.sosauce.cinnamon.data.local.db.datastore.rememberEnableT9Dialing
+import com.sosauce.cinnamon.data.local.db.datastore.rememberGroupSubsequentCalls
+import com.sosauce.cinnamon.presentation.components.SimsViewModel
 import com.sosauce.cinnamon.presentation.screens.settings.components.LazyRowWithScrollButton
 import com.sosauce.cinnamon.presentation.screens.settings.components.PhoneAccountHandleSelector
 import com.sosauce.cinnamon.presentation.screens.settings.components.SettingsWithTitle
 import com.sosauce.cinnamon.presentation.screens.settings.components.SwitchSettingsCard
-import com.sosauce.cinnamon.presentation.shared_components.SimsViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

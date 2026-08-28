@@ -26,7 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.presentation.shared_components.AppIcon
+import com.sosauce.cinnamon.presentation.components.AppIcon
 import com.sosauce.cinnamon.utils.GITHUB_RELEASES
 import com.sosauce.cinnamon.utils.SUPPORT_PAGE
 import com.sosauce.cinnamon.utils.appVersion

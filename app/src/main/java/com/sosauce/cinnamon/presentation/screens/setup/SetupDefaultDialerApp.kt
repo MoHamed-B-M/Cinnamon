@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.utils.Spacer
 import com.sosauce.cinnamon.utils.createDefaultDialerIntent
-import com.sosauce.cinnamon.utils.createDefaultSmsIntent
 
 @Composable
 fun SetupDefaultDialerScreen(

@@ -11,8 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import com.sosauce.cinnamon.domain.model.AudioRoute
+import com.sosauce.cinnamon.presentation.components.items.CuteListItem
 import com.sosauce.cinnamon.presentation.screens.phone.CallAction
-import com.sosauce.cinnamon.presentation.shared_components.items.CuteListItem
 import com.sosauce.cinnamon.utils.getItemShape
 
 @Composable

@@ -10,9 +10,9 @@ import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastFilter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sosauce.cinnamon.data.datastore.UserPreferences
+import com.sosauce.cinnamon.data.local.db.datastore.UserPreferences
+import com.sosauce.cinnamon.data.repository.ContactsRepository
 import com.sosauce.cinnamon.domain.model.CuteContact
-import com.sosauce.cinnamon.domain.repository.ContactsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow

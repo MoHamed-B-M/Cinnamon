@@ -1,5 +1,5 @@
 [versions]
-agp = "9.2.1"
+agp = "9.3.1"
 androidSmsmms = "0.2.0"
 cloudy = "0.5.0"
 coilCompose = "3.5.0"
@@ -12,31 +12,32 @@ hazeMaterials = "1.7.2"
 koinAndroid = "4.2.2"
 koinAndroidxCompose = "4.2.2"
 koinAndroidxStartup = "4.2.2"
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 coreKtx = "1.19.0"
 lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
-composeBom = "2026.06.01"
+composeBom = "2026.08.00"
 kotlinxSerializationJson = "1.11.0"
 lottieCompose = "6.7.1"
-materialKolor = "5.0.0-alpha07"
-media3Exoplayer = "1.10.1"
-media3UiCompose = "1.10.1"
-pagingCompose = "3.5.0"
-serialization = "2.4.0"
+materialKolor = "5.0.0"
+media3Exoplayer = "1.11.0"
+media3UiCompose = "1.11.0"
+pagingCompose = "3.5.1"
+serialization = "2.4.10"
 roomCompiler = "2.8.4"
 roomKtx = "2.8.4"
-ksp = "2.3.4"
-material3 = "1.5.0-alpha23"
-nav3Core = "1.1.4"
+ksp = "2.3.6"
+material3 = "1.5.0-alpha27"
+nav3Core = "1.1.7"
 datastorePreferences = "1.2.1"
 coreSplashscreen = "1.2.0"
-foundationLayout = "1.11.4"
+foundationLayout = "1.12.0"
 lifecycleViewmodelNav3 = "2.11.0"
-squircleShape = "5.3.0"
+squircleShape = "5.4.0"
 sweetselectCompose = "1.0.1"
 workRuntimeKtx = "2.11.2"
-zoomable = "2.12.0"
+zoomable = "2.13.0"
+nekobites = "1.0.3"
 
 
 
@@ -81,6 +82,8 @@ androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecy
 squircle-shape = { module = "com.stoyanvuchev:squircle-shape", version.ref = "squircleShape" }
 sweetselect-compose = { module = "io.github.sosauce:sweetselect-compose", version.ref = "sweetselectCompose" }
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
+nekobites = { module = "com.github.sosauce:NekoBites", version.ref = "nekobites" }
+
 
 
 

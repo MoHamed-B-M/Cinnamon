@@ -41,12 +41,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.fetchers.PhotoQuality
+import com.sosauce.cinnamon.data.local.providers.PhotoQuality
 import com.sosauce.cinnamon.domain.model.AudioRoute
-import com.sosauce.cinnamon.domain.states.CallState
+import com.sosauce.cinnamon.presentation.screens.messages.CallState
+import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
 import com.sosauce.cinnamon.presentation.screens.phone.components.CallBottomBar
 import com.sosauce.cinnamon.presentation.screens.phone.components.IncomingBottomBar
-import com.sosauce.cinnamon.presentation.shared_components.DefaultContactIcon
 import com.sosauce.cinnamon.presentation.theme.CinnamonTheme
 import com.sosauce.cinnamon.utils.bouncySpec
 import com.sosauce.cinnamon.utils.toStopwatch

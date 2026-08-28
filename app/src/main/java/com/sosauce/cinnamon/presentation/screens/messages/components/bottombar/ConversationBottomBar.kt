@@ -68,6 +68,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -77,9 +78,9 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.window.Popup
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.datastore.rememberShowCharCount
-import com.sosauce.cinnamon.data.providers.ComposeFileProvider
-import com.sosauce.cinnamon.data.schedulers.scheduled_messages.ScheduledMessage
+import com.sosauce.cinnamon.data.local.db.datastore.rememberShowCharCount
+import com.sosauce.cinnamon.data.local.db.room.scheduledMessages.ScheduledMessage
+import com.sosauce.cinnamon.data.local.providers.ComposeFileProvider
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationActions
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationDetailsState
 import com.sosauce.cinnamon.presentation.screens.messages.components.AnimatedCounter
@@ -91,7 +92,6 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.math.ceil
-import androidx.compose.ui.layout.onSizeChanged
 
 
 @Composable
@@ -286,7 +286,7 @@ fun ConversationBottomBar(
                     shape = RoundedCornerShape(cornerRadius),
                 )
                 .padding(10.dp)
-        ){
+        ) {
             Row(
                 modifier = Modifier.animateContentSize(),
                 verticalAlignment = Alignment.CenterVertically
@@ -304,7 +304,10 @@ fun ConversationBottomBar(
                 TextField(
                     state = viewModel.textFieldState,
                     shape = RoundedCornerShape(cornerRadius),
-                    lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 1, maxHeightInLines = 6),
+                    lineLimits = TextFieldLineLimits.MultiLine(
+                        minHeightInLines = 1,
+                        maxHeightInLines = 6
+                    ),
                     modifier = Modifier.weight(1f),
                     colors = TextFieldDefaults.colors(
                         unfocusedIndicatorColor = Color.Transparent,

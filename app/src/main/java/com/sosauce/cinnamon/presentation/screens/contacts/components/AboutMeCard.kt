@@ -14,8 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
 import com.sosauce.cinnamon.presentation.navigation.Screen
-import com.sosauce.cinnamon.presentation.shared_components.DefaultContactIcon
 
 @Composable
 fun AboutMeCard(

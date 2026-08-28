@@ -72,14 +72,14 @@ import androidx.compose.ui.util.fastForEachIndexed
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import coil3.compose.AsyncImage
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.contact_settings.ContactSettingsActions
+import com.sosauce.cinnamon.data.local.db.room.contactSettings.ContactSettingsActions
 import com.sosauce.cinnamon.domain.model.CuteContact
-import com.sosauce.cinnamon.presentation.shared_components.ImagePickerCard
-import com.sosauce.cinnamon.presentation.shared_components.animations.AnimatedFab
-import com.sosauce.cinnamon.presentation.shared_components.buttons.CuteNavigationButtonSurface
+import com.sosauce.cinnamon.presentation.components.ImagePickerCard
+import com.sosauce.cinnamon.presentation.components.buttons.CuteNavigationButtonSurface
 import com.sosauce.cinnamon.utils.SharedTransitionKeys
 import com.sosauce.cinnamon.utils.bouncySpec
 import com.sosauce.cinnamon.utils.copyMutate
+import com.sosauce.nekobites.animations.AnimatedFab
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -142,7 +142,8 @@ fun SharedTransitionScope.EditContactScreen(
                 AnimatedFab(
                     onClick = {
                         onHandeEditContactAction(EditContactAction.SaveEditedContact(contact))
-                        onNavigateUp()
+                        //TODO: SEND EVENT WHEN SAVING IS DONE ONLY THEN NAVIGATE BACK
+                        //onNavigateUp()
                     },
                     icon = R.drawable.check,
                     enabled = contact != state.contact

@@ -14,10 +14,10 @@ import coil3.SingletonImageLoader
 import coil3.request.crossfade
 import coil3.video.VideoFrameDecoder
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.fetchers.RecipientPhoneKeyer
-import com.sosauce.cinnamon.data.fetchers.RecipientPhotoFetcher
-import com.sosauce.cinnamon.data.managers.CallNotificationManager
-import com.sosauce.cinnamon.data.managers.MessageNotificationManager
+import com.sosauce.cinnamon.data.local.providers.RecipientPhoneKeyer
+import com.sosauce.cinnamon.data.local.providers.RecipientPhotoFetcher
+import com.sosauce.cinnamon.data.telephony.message.MessageNotificationManager
+import com.sosauce.cinnamon.data.telephony.phone.CallNotificationManager
 import com.sosauce.cinnamon.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.androix.startup.KoinStartup

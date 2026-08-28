@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -27,10 +26,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.sosauce.cinnamon.data.datastore.PreferencesKeys.DEFAULT_TAB
-import com.sosauce.cinnamon.data.datastore.dataStore
-import com.sosauce.cinnamon.data.datastore.rememberInitialTab
-import com.sosauce.cinnamon.data.datastore.rememberInitialTabBlocking
+import com.sosauce.cinnamon.data.local.db.datastore.rememberInitialTabBlocking
 import com.sosauce.cinnamon.presentation.screens.archived.ArchivedThreads
 import com.sosauce.cinnamon.presentation.screens.archived.ArchivedViewModel
 import com.sosauce.cinnamon.presentation.screens.contacts.AboutMeScreen
@@ -59,15 +55,12 @@ import com.sosauce.cinnamon.presentation.screens.voicemail.VoicemailViewModel
 import com.sosauce.cinnamon.presentation.screens.wallpaper.ConversationTheming
 import com.sosauce.cinnamon.presentation.screens.wallpaper.ThemingViewModel
 import com.sosauce.cinnamon.presentation.theme.defaultColorScheme
-import com.sosauce.cinnamon.utils.DefaultTabOption
 import com.sosauce.cinnamon.utils.LocalHazeState
 import com.sosauce.cinnamon.utils.LocalScreen
 import com.sosauce.cinnamon.utils.bouncySpecNavigation
 import com.sosauce.cinnamon.utils.navigateBack
 import com.sosauce.cinnamon.utils.rememberHazeState
 import com.sosauce.cinnamon.utils.tabToScreen
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 

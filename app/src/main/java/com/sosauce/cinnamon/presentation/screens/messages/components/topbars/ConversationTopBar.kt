@@ -39,15 +39,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import com.sosauce.cinnamon.R
+import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
+import com.sosauce.cinnamon.presentation.components.DefaultGroupChatIcon
+import com.sosauce.cinnamon.presentation.components.toolbars.ToolbarSkeleton
 import com.sosauce.cinnamon.presentation.navigation.Screen
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationActions
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationDetailsState
 import com.sosauce.cinnamon.presentation.screens.phone.CallAction
-import com.sosauce.cinnamon.presentation.shared_components.DefaultContactIcon
-import com.sosauce.cinnamon.presentation.shared_components.DefaultGroupChatIcon
-import com.sosauce.cinnamon.presentation.shared_components.animations.AnimatedMoreIcon
-import com.sosauce.cinnamon.presentation.shared_components.toolbars.ToolbarSkeleton
 import com.sosauce.cinnamon.utils.getItemShape
+import com.sosauce.nekobites.animations.AnimatedDrawable
+import com.sosauce.nekobites.animations.AnimatedDrawableFile
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 
 @Composable
@@ -213,7 +214,10 @@ fun SharedTransitionScope.ConversationTopBar(
                 onClick = { showMoreMenu = true },
                 shapes = IconButtonDefaults.shapes()
             ) {
-                AnimatedMoreIcon(showMoreMenu)
+                AnimatedDrawable(
+                    atEnd = showMoreMenu,
+                    drawable = AnimatedDrawableFile.MORE_VERT
+                )
                 DropdownMenuPopup(
                     expanded = showMoreMenu,
                     onDismissRequest = { showMoreMenu = false },

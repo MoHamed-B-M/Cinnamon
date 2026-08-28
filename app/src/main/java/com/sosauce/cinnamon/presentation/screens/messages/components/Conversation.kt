@@ -38,12 +38,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.domain.model.CuteConversation
+import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
+import com.sosauce.cinnamon.presentation.components.DefaultGroupChatIcon
+import com.sosauce.cinnamon.presentation.components.items.CuteListItem
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationsAction
-import com.sosauce.cinnamon.presentation.shared_components.DefaultContactIcon
-import com.sosauce.cinnamon.presentation.shared_components.DefaultGroupChatIcon
-import com.sosauce.cinnamon.presentation.shared_components.animations.AnimatedSelectedIcon
-import com.sosauce.cinnamon.presentation.shared_components.items.CuteListItem
 import com.sosauce.cinnamon.utils.toDate
+import com.sosauce.nekobites.components.AnimatedSelectedIcon
 
 @Composable
 fun SharedTransitionScope.Conversation(

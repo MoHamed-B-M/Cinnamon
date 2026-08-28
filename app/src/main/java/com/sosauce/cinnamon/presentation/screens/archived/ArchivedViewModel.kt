@@ -5,9 +5,9 @@ package com.sosauce.cinnamon.presentation.screens.archived
 import android.provider.Telephony
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sosauce.cinnamon.data.datastore.UserPreferences
+import com.sosauce.cinnamon.data.local.db.datastore.UserPreferences
+import com.sosauce.cinnamon.data.repository.MessagesRepository
 import com.sosauce.cinnamon.domain.model.CuteConversation
-import com.sosauce.cinnamon.domain.repository.MessagesRepository
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationsAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

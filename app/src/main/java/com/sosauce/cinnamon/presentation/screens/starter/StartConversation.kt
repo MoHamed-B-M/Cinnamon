@@ -43,16 +43,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastMap
 import com.sosauce.cinnamon.R
+import com.sosauce.cinnamon.presentation.components.buttons.CuteNavigationButtonSurface
+import com.sosauce.cinnamon.presentation.components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.presentation.navigation.Screen
 import com.sosauce.cinnamon.presentation.screens.contacts.ContactListItem
 import com.sosauce.cinnamon.presentation.screens.contacts.components.dialogs.NumberPickerDialog
-import com.sosauce.cinnamon.presentation.shared_components.NoXFound
-import com.sosauce.cinnamon.presentation.shared_components.buttons.CuteNavigationButtonSurface
-import com.sosauce.cinnamon.presentation.shared_components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.utils.LazyListKeys
 import com.sosauce.cinnamon.utils.bouncySpec
 import com.sosauce.cinnamon.utils.getThreadIdOrCreate
 import com.sosauce.cinnamon.utils.selfAlignHorizontally
+import com.sosauce.nekobites.components.NoXFound
 
 @Composable
 fun SharedTransitionScope.StartConversation(

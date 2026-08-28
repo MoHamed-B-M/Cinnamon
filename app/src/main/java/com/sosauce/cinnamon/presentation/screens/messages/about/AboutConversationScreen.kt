@@ -43,12 +43,12 @@ import coil3.compose.AsyncImage
 import com.skydoves.cloudy.cloudy
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.domain.model.AttachmentType
+import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
+import com.sosauce.cinnamon.presentation.components.DefaultGroupChatIcon
+import com.sosauce.cinnamon.presentation.components.buttons.CuteNavigationButton
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationActions
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationDetailsState
 import com.sosauce.cinnamon.presentation.screens.messages.components.bubble.ImageAttachment
-import com.sosauce.cinnamon.presentation.shared_components.DefaultContactIcon
-import com.sosauce.cinnamon.presentation.shared_components.DefaultGroupChatIcon
-import com.sosauce.cinnamon.presentation.shared_components.buttons.CuteNavigationButton
 import com.sosauce.cinnamon.utils.SharedTransitionKeys
 import com.sosauce.cinnamon.utils.selfAlignHorizontally
 

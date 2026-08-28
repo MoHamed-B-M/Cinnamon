@@ -9,9 +9,9 @@ import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sosauce.cinnamon.data.datastore.UserPreferences
+import com.sosauce.cinnamon.data.local.db.datastore.UserPreferences
+import com.sosauce.cinnamon.data.repository.DialerRepository
 import com.sosauce.cinnamon.domain.model.CuteCallLog
-import com.sosauce.cinnamon.domain.repository.DialerRepository
 import com.sosauce.cinnamon.utils.copyMutate
 import com.sosauce.cinnamon.utils.groupSubsequentlyBy
 import com.sosauce.cinnamon.utils.toDate

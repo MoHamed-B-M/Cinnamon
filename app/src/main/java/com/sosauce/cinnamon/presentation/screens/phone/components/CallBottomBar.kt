@@ -40,8 +40,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.domain.states.CallState
-import com.sosauce.cinnamon.domain.states.DialerPaneContent
+import com.sosauce.cinnamon.presentation.screens.messages.CallState
+import com.sosauce.cinnamon.presentation.screens.messages.DialerPaneContent
 import com.sosauce.cinnamon.presentation.screens.phone.CallAction
 import com.sosauce.cinnamon.presentation.screens.phone.CallingState
 import com.sosauce.cinnamon.utils.bouncySpec
@@ -122,8 +122,7 @@ fun CallBottomBar(
                             onCheckedChange = { onCallAction(CallAction.ToggleMute(!callUiState.isMuted)) },
                             enabled = callUiState.callState != CallState.ENDED,
                             interactionSource = interactionSources[0],
-                            shapes = ToggleButtonDefaults.shapes(),
-                            colors = ToggleButtonDefaults.toggleButtonColors(
+                            colors = ToggleButtonDefaults.colors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                                 contentColor = contentColorFor(MaterialTheme.colorScheme.surfaceContainerHigh)
                             ),
@@ -155,8 +154,7 @@ fun CallBottomBar(
                             },
                             enabled = callUiState.callState != CallState.ENDED,
                             interactionSource = interactionSources[1],
-                            shapes = ToggleButtonDefaults.shapes(),
-                            colors = ToggleButtonDefaults.toggleButtonColors(
+                            colors = ToggleButtonDefaults.colors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                                 contentColor = contentColorFor(MaterialTheme.colorScheme.surfaceContainerHigh)
                             ),
@@ -186,8 +184,7 @@ fun CallBottomBar(
                             onCheckedChange = { onCallAction(CallAction.ToggleHold) },
                             enabled = callUiState.callState != CallState.ENDED,
                             interactionSource = interactionSources[2],
-                            shapes = ToggleButtonDefaults.shapes(),
-                            colors = ToggleButtonDefaults.toggleButtonColors(
+                            colors = ToggleButtonDefaults.colors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                                 contentColor = contentColorFor(MaterialTheme.colorScheme.surfaceContainerHigh)
                             ),
@@ -219,8 +216,7 @@ fun CallBottomBar(
                             },
                             enabled = callUiState.callState != CallState.ENDED,
                             interactionSource = interactionSources[3],
-                            shapes = ToggleButtonDefaults.shapes(),
-                            colors = ToggleButtonDefaults.toggleButtonColors(
+                            colors = ToggleButtonDefaults.colors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                                 contentColor = contentColorFor(MaterialTheme.colorScheme.surfaceContainerHigh)
                             ),

@@ -154,6 +154,7 @@
     <string name="default_dialer_app">Default dialer app</string>
     <string name="default_dialer_app_desc">This is required to use phone capabilities</string>
     <string name="android_16_warning">On Android 16 and above, you\'ll have to allow restricted permissions in order to use the app. Click this card to learn how.</string>
+    <string name="better_luck_next_time">Better luck next time!</string>
 
 
     <plurals name="delete_msg">

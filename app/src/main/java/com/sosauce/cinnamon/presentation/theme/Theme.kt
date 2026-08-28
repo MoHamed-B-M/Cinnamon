@@ -18,9 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import com.materialkolor.dynamiccolor.ColorSpec
 import com.materialkolor.rememberDynamicColorScheme
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.datastore.rememberAppTheme
-import com.sosauce.cinnamon.data.datastore.rememberPaletteStyle
-import com.sosauce.cinnamon.data.datastore.rememberUseSystemFont
+import com.sosauce.cinnamon.data.local.db.datastore.rememberAppTheme
+import com.sosauce.cinnamon.data.local.db.datastore.rememberPaletteStyle
+import com.sosauce.cinnamon.data.local.db.datastore.rememberUseSystemFont
 import com.sosauce.cinnamon.utils.CuteTheme
 import com.sosauce.cinnamon.utils.getAdaptivePrimaryColor
 import com.sosauce.cinnamon.utils.toPaletteStyle

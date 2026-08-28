@@ -3,11 +3,10 @@
 package com.sosauce.cinnamon.presentation.screens.settings
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MenuDefaults
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,11 +16,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.datastore.rememberInitialTab
+import com.sosauce.cinnamon.data.local.db.datastore.rememberInitialTab
 import com.sosauce.cinnamon.presentation.screens.settings.components.DropdownMenuSettingsCard
 import com.sosauce.cinnamon.presentation.screens.settings.components.SettingsWithTitle
 import com.sosauce.cinnamon.utils.DefaultTabOption
-import com.sosauce.cinnamon.utils.getItemShape
 import com.sosauce.cinnamon.utils.toLocalizedTab
 
 @Composable
@@ -47,11 +45,11 @@ fun SettingsBehavior() {
 
                         val isSelected = tab == initialTab
 
-                        DropdownMenuItem(
+                        SelectableDropdownMenuItem(
                             selected = isSelected,
                             onClick = { initialTab = tab },
                             text = { Text(context.toLocalizedTab(tab)) },
-                            trailingIcon = {
+                            trailingContent = {
                                 if (isSelected) {
                                     Icon(
                                         painter = painterResource(R.drawable.check),

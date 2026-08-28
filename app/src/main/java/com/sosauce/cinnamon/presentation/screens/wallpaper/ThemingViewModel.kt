@@ -2,8 +2,8 @@ package com.sosauce.cinnamon.presentation.screens.wallpaper
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sosauce.cinnamon.data.conversation_settings.ConversationSettingActions
-import com.sosauce.cinnamon.data.conversation_settings.ConversationSettingsDao
+import com.sosauce.cinnamon.data.local.db.room.conversationSettings.ConversationSettingActions
+import com.sosauce.cinnamon.data.local.db.room.conversationSettings.ConversationSettingsDao
 import com.sosauce.cinnamon.domain.model.ConversationSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

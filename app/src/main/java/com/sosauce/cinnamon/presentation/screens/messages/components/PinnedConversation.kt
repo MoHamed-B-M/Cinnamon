@@ -2,10 +2,6 @@
 
 package com.sosauce.cinnamon.presentation.screens.messages.components
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -25,10 +21,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.domain.model.CuteConversation
-import com.sosauce.cinnamon.presentation.shared_components.DefaultContactIcon
-import com.sosauce.cinnamon.presentation.shared_components.DefaultGroupChatIcon
-import com.sosauce.cinnamon.presentation.shared_components.SelectedItemLogo
+import com.sosauce.cinnamon.presentation.components.DefaultContactIcon
 import com.sosauce.cinnamon.utils.thenIf
+import com.sosauce.nekobites.components.AnimatedSelectedIcon
 
 @Composable
 fun PinnedConversation(
@@ -61,23 +56,14 @@ fun PinnedConversation(
                 .padding(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AnimatedContent(
-                targetState = isSelected,
-                transitionSpec = { scaleIn() togetherWith scaleOut() }
+            AnimatedSelectedIcon(
+                isSelected = isSelected
             ) {
-                if (it) {
-                    SelectedItemLogo(size = 70.dp)
-                } else {
-                    if (cuteConversation.isGroupChat) {
-                        DefaultGroupChatIcon(size = 70.dp)
-                    } else {
-                        DefaultContactIcon(
-                            firstLetter = cuteConversation.recipients.first().firstOrNull(),
-                            size = 70.dp,
-                            contactPhoneNumber = cuteConversation.rawRecipients.firstOrNull()
-                        )
-                    }
-                }
+                DefaultContactIcon(
+                    firstLetter = cuteConversation.recipients.first().firstOrNull(),
+                    size = 70.dp,
+                    contactPhoneNumber = cuteConversation.rawRecipients.firstOrNull()
+                )
             }
             Text(
                 text = cuteConversation.recipients.first(),

@@ -30,7 +30,7 @@ import coil3.compose.AsyncImage
 import com.skydoves.cloudy.cloudy
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.presentation.screens.messages.ConversationActions
-import com.sosauce.cinnamon.presentation.shared_components.animations.AnimatedFab
+import com.sosauce.nekobites.animations.AnimatedFab
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 

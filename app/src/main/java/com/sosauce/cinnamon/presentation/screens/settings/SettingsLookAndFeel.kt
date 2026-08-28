@@ -4,9 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -20,9 +18,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.data.datastore.rememberAppTheme
-import com.sosauce.cinnamon.data.datastore.rememberPaletteStyle
-import com.sosauce.cinnamon.data.datastore.rememberUseSystemFont
+import com.sosauce.cinnamon.data.local.db.datastore.rememberAppTheme
+import com.sosauce.cinnamon.data.local.db.datastore.rememberPaletteStyle
+import com.sosauce.cinnamon.data.local.db.datastore.rememberUseSystemFont
 import com.sosauce.cinnamon.presentation.screens.settings.components.FontSelector
 import com.sosauce.cinnamon.presentation.screens.settings.components.LazyRowWithScrollButton
 import com.sosauce.cinnamon.presentation.screens.settings.components.PaletteSelector

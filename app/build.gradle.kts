@@ -105,7 +105,6 @@ dependencies {
     implementation(libs.coil.video)
     implementation(libs.geocoder)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
-    implementation(libs.sweetselect.compose)
     implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.paging.runtime)
     implementation(libs.sweetselect.compose)
@@ -115,7 +114,7 @@ dependencies {
     implementation(libs.squircle.shape)
     implementation(libs.lottie.compose)
     implementation(libs.zoomable)
-    implementation("androidx.glance:glance-appwidget:1.1.1")
-    implementation("androidx.glance:glance-material3:1.1.1")
-    implementation("io.github.developersyndicate:composense:alpha-1.0.0")
+    implementation("androidx.glance:glance-appwidget:1.2.0")
+    implementation("androidx.glance:glance-material3:1.2.0")
+    implementation(libs.nekobites)
 }

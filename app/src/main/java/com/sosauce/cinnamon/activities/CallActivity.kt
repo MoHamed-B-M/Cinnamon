@@ -11,7 +11,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.sosauce.cinnamon.domain.states.CallState
+import com.sosauce.cinnamon.presentation.screens.messages.CallState
 import com.sosauce.cinnamon.presentation.screens.phone.CallAction
 import com.sosauce.cinnamon.presentation.screens.phone.CallScreen
 import com.sosauce.cinnamon.presentation.screens.phone.CallingViewModel

@@ -31,8 +31,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.presentation.screens.contacts.ContactListItem
 import com.sosauce.cinnamon.presentation.screens.contacts.ContactsViewModel
-import com.sosauce.cinnamon.presentation.shared_components.NoXFound
 import com.sosauce.cinnamon.utils.LazyListKeys
+import com.sosauce.nekobites.components.NoXFound
 import org.koin.androidx.compose.koinViewModel
 
 class ContactPickerActivity : ComponentActivity() {

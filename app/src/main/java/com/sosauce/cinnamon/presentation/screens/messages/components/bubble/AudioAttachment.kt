@@ -34,7 +34,7 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.compose.buttons.PlayPauseButton
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.presentation.shared_components.buttons.WavySlider
+import com.sosauce.cinnamon.presentation.components.buttons.WavySlider
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnsafeOptInUsageError")

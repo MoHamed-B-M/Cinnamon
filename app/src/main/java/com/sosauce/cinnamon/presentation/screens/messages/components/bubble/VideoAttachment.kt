@@ -50,7 +50,7 @@ import androidx.media3.ui.compose.ContentFrame
 import coil3.compose.AsyncImage
 import com.skydoves.cloudy.cloudy
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.presentation.shared_components.buttons.WavySlider
+import com.sosauce.cinnamon.presentation.components.buttons.WavySlider
 import com.sosauce.cinnamon.utils.ImageUtils
 import kotlinx.coroutines.delay
 

@@ -10,10 +10,10 @@ import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.sosauce.cinnamon.data.conversation_settings.ConversationSettingsDao
-import com.sosauce.cinnamon.data.datastore.UserPreferences
+import com.sosauce.cinnamon.data.local.db.datastore.UserPreferences
+import com.sosauce.cinnamon.data.local.db.room.conversationSettings.ConversationSettingsDao
+import com.sosauce.cinnamon.data.repository.MessagesRepository
 import com.sosauce.cinnamon.domain.model.CuteConversation
-import com.sosauce.cinnamon.domain.repository.MessagesRepository
 import com.sosauce.cinnamon.utils.observe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

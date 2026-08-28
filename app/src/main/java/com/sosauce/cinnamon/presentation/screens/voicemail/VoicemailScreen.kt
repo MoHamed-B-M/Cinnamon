@@ -34,12 +34,12 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.domain.model.CuteVoicemail
+import com.sosauce.cinnamon.presentation.components.SelectedBarSurface
+import com.sosauce.cinnamon.presentation.components.buttons.CuteNavigationButton
+import com.sosauce.cinnamon.presentation.components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.presentation.navigation.Screen
-import com.sosauce.cinnamon.presentation.shared_components.NoXFound
-import com.sosauce.cinnamon.presentation.shared_components.SelectedBarSurface
-import com.sosauce.cinnamon.presentation.shared_components.buttons.CuteNavigationButton
-import com.sosauce.cinnamon.presentation.shared_components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.utils.selfAlignHorizontally
+import com.sosauce.nekobites.components.NoXFound
 import com.sosauce.sweetselect.rememberSweetSelectState
 
 @Composable

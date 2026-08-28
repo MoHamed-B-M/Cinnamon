@@ -8,9 +8,9 @@ import androidx.compose.ui.util.fastForEach
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sosauce.cinnamon.R
+import com.sosauce.cinnamon.data.repository.ContactsRepository
 import com.sosauce.cinnamon.domain.model.CuteContact
 import com.sosauce.cinnamon.domain.model.CuteContactDetails
-import com.sosauce.cinnamon.domain.repository.ContactsRepository
 import ezvcard.Ezvcard
 import ezvcard.parameter.AddressType
 import ezvcard.parameter.EmailType
