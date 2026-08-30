@@ -55,7 +55,7 @@
 
 
     <application
-        android:name=".main.App"
+        android:name=".app.CinnamonApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -63,7 +63,7 @@
         android:theme="@style/Theme.CuteSplash"
         tools:targetApi="31">
         <activity
-            android:name=".main.MainActivity"
+            android:name=".app.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.CuteSplash"
             android:windowSoftInputMode="adjustResize">
@@ -102,12 +102,12 @@
         </activity>
 
         <activity
-            android:name=".activities.ContactPickerActivity"
+            android:name=".features.contacts.presentation.ContactPickerActivity"
             android:exported="true" />
 
 
         <provider
-            android:name=".data.local.providers.ComposeFileProvider"
+            android:name=".app.providers.ComposeFileProvider"
             android:authorities="${applicationId}.fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">
@@ -118,7 +118,7 @@
 
         <!-- BroadcastReceiver that listens for incoming SMS messages -->
         <receiver
-            android:name=".data.system.receivers.SmsReceiver"
+            android:name=".core.system.receivers.SmsReceiver"
             android:exported="true"
             android:permission="android.permission.BROADCAST_SMS">
             <intent-filter>
@@ -127,7 +127,7 @@
         </receiver>
 
         <receiver
-            android:name=".data.system.receivers.TestReceiver"
+            android:name=".core.system.receivers.TestReceiver"
             android:permission="android.permission.BROADCAST_WAP_PUSH"
             android:exported="true">
             <intent-filter>
@@ -139,7 +139,7 @@
 
         <!-- Service that delivers messages from the phone "quick response" -->
         <service
-            android:name=".data.system.services.QuickReplyService"
+            android:name=".core.system.services.QuickReplyService"
             android:exported="true"
             android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
             <intent-filter>
@@ -153,10 +153,10 @@
             </intent-filter>
         </service>
 
-        <receiver android:name=".data.system.receivers.MessageReplyReceiver" />
+        <receiver android:name=".core.system.receivers.MessageReplyReceiver" />
 
         <activity
-            android:name=".activities.CallActivity"
+            android:name=".features.phone.presentation.call.CallActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:showWhenLocked="true"
@@ -171,7 +171,7 @@
         </activity>
 
         <service
-            android:name=".data.system.services.CallService"
+            android:name=".core.system.services.CallService"
             android:exported="true"
             android:enabled="true"
             android:foregroundServiceType="phoneCall"
@@ -190,7 +190,7 @@
         </service>
 
         <service
-            android:name=".data.system.services.CuteCallScreeningService"
+            android:name=".core.system.services.CuteCallScreeningService"
             android:exported="true"
             android:permission="android.permission.BIND_SCREENING_SERVICE">
             <intent-filter>
@@ -205,11 +205,11 @@
             android:taskAffinity="cinnamon.SMS_SENT" />
 
         <receiver
-            android:name=".data.system.receivers.DeliveryReportsReceiver"
+            android:name=".core.system.receivers.DeliveryReportsReceiver"
             android:exported="true" />
 
         <receiver
-            android:name=".data.system.receivers.MmsReceiver"
+            android:name=".core.system.receivers.MmsReceiver"
             android:exported="true"
             android:permission="android.permission.BROADCAST_WAP_PUSH">
             <intent-filter>
@@ -224,14 +224,14 @@
             android:taskAffinity="cinnamon.SMS_DELIVERED" />
         <!-- Your custom receiver which is child of com.klinker.android.send_message.MmsSentReceiver -->
         <receiver
-            android:name=".data.system.receivers.CuteMmsSentReceiver"
+            android:name=".core.system.receivers.CuteMmsSentReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.klinker.android.messaging.MMS_SENT" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".data.system.receivers.CallReceiver" />
+        <receiver android:name=".core.system.receivers.CallReceiver" />
 
     </application>
 

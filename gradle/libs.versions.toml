@@ -1,9 +1,9 @@
 [versions]
-agp = "9.3.1"
+agp = "9.3.2"
 androidSmsmms = "0.2.0"
-cloudy = "0.5.0"
+cloudy = "0.7.1"
 coilCompose = "3.5.0"
-coilVideo = "3.5.0"
+coilVideo = "3.6.0"
 colorpickerCompose = "1.2.0"
 ezVcard = "0.12.2"
 geocoder = "8.12.18.1"

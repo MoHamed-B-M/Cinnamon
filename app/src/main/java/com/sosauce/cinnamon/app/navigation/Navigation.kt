@@ -1,0 +1,365 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
+package com.sosauce.cinnamon.app.navigation
+
+import android.content.Intent
+import android.widget.Toast
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
+import com.sosauce.cinnamon.R
+import com.sosauce.cinnamon.core.datastore.rememberInitialTabBlocking
+import com.sosauce.cinnamon.features.messaging.presentation.archived.ArchivedConversationsScreen
+import com.sosauce.cinnamon.features.messaging.presentation.archived.ArchivedConversationsViewModel
+import com.sosauce.cinnamon.features.contacts.presentation.ContactDetailsScreen
+import com.sosauce.cinnamon.features.contacts.presentation.ContactDetailsViewModel
+import com.sosauce.cinnamon.features.contacts.presentation.ContactsScreen
+import com.sosauce.cinnamon.features.contacts.presentation.ContactsViewModel
+import com.sosauce.cinnamon.features.contacts.presentation.editor.EditContactScreen
+import com.sosauce.cinnamon.features.contacts.presentation.editor.EditContactViewModel
+import com.sosauce.cinnamon.features.phone.presentation.logs.CallLogsScreen
+import com.sosauce.cinnamon.features.phone.presentation.logs.CallLogsViewModel
+import com.sosauce.cinnamon.features.phone.presentation.dialpad.DialpadScreen
+import com.sosauce.cinnamon.features.phone.presentation.dialpad.DialpadViewModel
+import com.sosauce.cinnamon.features.phone.presentation.call.CallingViewModel
+import com.sosauce.cinnamon.features.messaging.presentation.starter.StartConversation
+import com.sosauce.cinnamon.features.messaging.presentation.starter.StartConversationViewModel
+import com.sosauce.cinnamon.features.phone.presentation.voicemail.VoicemailScreen
+import com.sosauce.cinnamon.features.phone.presentation.voicemail.VoicemailViewModel
+import com.sosauce.cinnamon.features.messaging.presentation.customization.ConversationTheming
+import com.sosauce.cinnamon.features.messaging.presentation.customization.ThemingViewModel
+import com.sosauce.cinnamon.core.ui.defaultColorScheme
+import com.sosauce.cinnamon.core.utils.LocalHazeState
+import com.sosauce.cinnamon.core.utils.LocalScreen
+import com.sosauce.cinnamon.core.utils.bouncySpecNavigation
+import com.sosauce.cinnamon.core.utils.navigateBack
+import com.sosauce.cinnamon.core.utils.rememberHazeState
+import com.sosauce.cinnamon.core.utils.tabToScreen
+import com.sosauce.cinnamon.features.messaging.presentation.conversation.ConversationActions
+import com.sosauce.cinnamon.features.messaging.presentation.conversation.ConversationDetailsEvents
+import com.sosauce.cinnamon.features.messaging.presentation.conversation.ConversationDetailsScreen
+import com.sosauce.cinnamon.features.messaging.presentation.conversation.ConversationDetailsViewModel
+import com.sosauce.cinnamon.features.messaging.presentation.conversation.ConversationsScreen
+import com.sosauce.cinnamon.features.messaging.presentation.conversation.ConversationsViewModel
+import com.sosauce.cinnamon.features.messaging.presentation.conversation.about.AboutConversationScreen
+import com.sosauce.cinnamon.settings.SettingsScreen
+import com.sosauce.nekobites.helpers.ObserveAsEvents
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+
+
+@Composable
+fun Nav(
+    intent: Intent?
+) {
+
+    val context = LocalContext.current
+    val resources = LocalResources.current
+    val initialTab = rememberInitialTabBlocking()
+    val backStack = rememberNavBackStack(initialTab.tabToScreen())
+    val hazeState = rememberHazeState()
+
+    LaunchedEffect(intent) { backStack.handleIntent(context, intent) }
+
+    CompositionLocalProvider(
+        LocalScreen provides backStack.last(),
+        LocalHazeState provides hazeState
+    ) {
+        SharedTransitionLayout {
+            NavDisplay(
+                backStack = backStack,
+                modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                entryDecorators = listOf(
+                    rememberSaveableStateHolderNavEntryDecorator(),
+                    rememberViewModelStoreNavEntryDecorator()
+                ),
+                predictivePopTransitionSpec = { ContentTransform(fadeIn(), fadeOut()) },
+                entryProvider = entryProvider {
+
+                    entry<Screen.Contacts>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) {
+                        val viewModel = koinViewModel<ContactsViewModel>()
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        ContactsScreen(
+                            state = state,
+                            textFieldState = viewModel.textFieldState,
+                            onNavigate = backStack::add,
+                            onHandleContactsAction = viewModel::handleContactsAction
+                        )
+                    }
+
+                    entry<Screen.ContactDetails>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) { key ->
+
+                        val viewModel = koinViewModel<ContactDetailsViewModel>(
+                            parameters = { parametersOf(key.contactId) }
+                        )
+                        val callViewModel = koinViewModel<CallingViewModel>()
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        ContactDetailsScreen(
+                            state = state,
+                            onNavigateBack = backStack::navigateBack,
+                            onNavigate = backStack::add,
+                            onHandleCallAction = callViewModel::handleCallAction,
+                            onHandleContactDetailsAction = viewModel::handleContactDetailsAction
+                        )
+                    }
+                    entry<Screen.Dialer>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) {
+                        val viewModel = koinViewModel<CallLogsViewModel>()
+                        val callViewModel = koinViewModel<CallingViewModel>()
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        CallLogsScreen(
+                            state = state,
+                            onNavigate = backStack::add,
+                            onHandleCallActions = callViewModel::handleCallAction,
+                            onHandleDialerActions = viewModel::handleDialerAction
+                        )
+                    }
+
+                    entry<Screen.Voicemail>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) {
+                        val viewModel = koinViewModel<VoicemailViewModel>()
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        VoicemailScreen(
+                            state = state,
+                            onNavigateUp = backStack::navigateBack,
+                            onNavigate = backStack::add,
+                            onDeleteVoicemails = viewModel::deleteVoicemails
+                        )
+                    }
+
+                    entry<Screen.Conversations>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) {
+
+                        val viewModel = koinViewModel<ConversationsViewModel>()
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        ConversationsScreen(
+                            state = state,
+                            textFieldState = viewModel.textFieldState,
+                            onNavigate = backStack::add,
+                            onHandleConversationsAction = viewModel::handleThreadsAction
+                        )
+                    }
+
+                    entry<Screen.ConversationDetails>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) { key ->
+                        val viewModel = koinViewModel<ConversationDetailsViewModel>(
+                            parameters = { parametersOf(key.threadId) }
+                        )
+                        val callViewModel = koinViewModel<CallingViewModel>()
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        ObserveAsEvents(viewModel.events) { event ->
+                            when(event) {
+                                is ConversationDetailsEvents.MmsSave -> {
+                                    val text = if (event.success) {
+                                        resources.getString(R.string.saved)
+                                    } else {
+                                        resources.getString(R.string.failed_to_save_mms)
+                                    }
+
+                                    Toast.makeText(
+                                        context,
+                                        text,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+
+
+
+                        LaunchedEffect(Unit) {
+                            viewModel.handleConversationActions(ConversationActions.MarkAsRead)
+                            viewModel.handleConversationActions(ConversationActions.ClearThreadNotifications)
+                        }
+
+                        MaterialExpressiveTheme(
+                            colorScheme = defaultColorScheme(
+                                forcedColor = if (state.settings.color != -1) Color(state.settings.color) else MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            ConversationDetailsScreen(
+                                state = state,
+                                prefilledMessage = key.prefilledMessage,
+                                onNavigateUp = backStack::navigateBack,
+                                onHandleCallAction = callViewModel::handleCallAction,
+                                onNavigate = backStack::add,
+                                onDeleteConversation = viewModel::deleteConversation,
+                                onHandleConversationSettingsActions = viewModel::handleConversationSettingsActions,
+                                onHandleConversationActions = viewModel::handleConversationActions
+                            )
+                        }
+
+                    }
+
+                    entry<Screen.ConversationTheming>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) { key ->
+                        val viewModel = koinViewModel<ThemingViewModel>(
+                            parameters = { parametersOf(key.threadId) }
+                        )
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        ConversationTheming(
+                            state = state,
+                            threadId = key.threadId,
+                            onHandleConversationSettingsActions = viewModel::handleConversationSettingsActions,
+                            onNavigateBack = backStack::navigateBack
+                        )
+                    }
+
+                    entry<Screen.Dialpad>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) { key ->
+                        val callViewModel = koinViewModel<CallingViewModel>()
+                        val viewModel = koinViewModel<DialpadViewModel>(
+                            parameters = { parametersOf(key.prefilledNumber) }
+                        )
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        DialpadScreen(
+                            state = state,
+                            onNavigate = backStack::add,
+                            onNavigateUp = backStack::navigateBack,
+                            onHandleCallAction = callViewModel::handleCallAction,
+                            onAddPlus = viewModel::addPlus
+                        )
+                    }
+
+                    entry<Screen.StartConversation>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) {
+
+                        val viewModel = koinViewModel<StartConversationViewModel>()
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        StartConversation(
+                            state = state,
+                            onNavigateUp = backStack::navigateBack,
+                            onNavigate = backStack::add,
+                            onToggleGroupChatMode = viewModel::toggleGroupChatMode,
+                            onAddNumberToGroup = viewModel::addNumberToGroup
+                        )
+                    }
+
+                    entry<Screen.AboutConversation>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) { key ->
+                        val viewModel = koinViewModel<ConversationDetailsViewModel>(
+                            parameters = { parametersOf(key.threadId) }
+                        )
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+                        AboutConversationScreen(
+                            state = state,
+                            onNavigateBack = backStack::navigateBack,
+                            onHandleConversationActions = viewModel::handleConversationActions
+                        )
+                    }
+
+                    entry<Screen.ArchivedThreads>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) {
+
+                        val viewModel = koinViewModel<ArchivedConversationsViewModel>()
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        ArchivedConversationsScreen(
+                            state = state,
+                            onNavigateUp = backStack::navigateBack,
+                            onNavigate = backStack::add,
+                            onHandleThreadsAction = viewModel::handleThreadsAction
+                        )
+                    }
+
+                    entry<Screen.Settings>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) {
+                        SettingsScreen(
+                            onNavigateUp = backStack::navigateBack
+                        )
+                    }
+
+                    entry<Screen.ContactEditor>(
+                        metadata = NavDisplay.transitionSpec {
+                            slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn() togetherWith fadeOut()
+                        }
+                    ) { key ->
+
+                        val viewModel = koinViewModel<EditContactViewModel>(
+                            parameters = { parametersOf(key.contact) }
+                        )
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+
+                        EditContactScreen(
+                            state = state,
+                            onNavigateUp = backStack::navigateBack,
+                            onHandleContactSettingsAction = viewModel::handleContactSettingsAction,
+                            onHandeEditContactAction = viewModel::handleEditContactAction
+                        )
+                    }
+                }
+            )
+        }
+    }
+}
+
