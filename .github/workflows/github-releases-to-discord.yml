@@ -3,6 +3,7 @@ name: Publish release to Discord
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   github-releases-to-discord:
