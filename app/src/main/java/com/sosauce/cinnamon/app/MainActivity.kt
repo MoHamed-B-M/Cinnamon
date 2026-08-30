@@ -27,23 +27,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-
-            val theme by rememberAppTheme()
-            val isSystemInDarkTheme = isSystemInDarkTheme()
-
-
             CinnamonTheme {
-
-                WindowCompat
-                    .getInsetsController(window, window.decorView)
-                    .apply {
-
-                        val isLight =
-                            if (theme == CuteTheme.SYSTEM) !isSystemInDarkTheme else theme == CuteTheme.LIGHT
-
-                        isAppearanceLightStatusBars = isLight
-                        isAppearanceLightNavigationBars = isLight
-                    }
 
                 var hasBothRoles by remember { mutableStateOf(hasBothRoles()) }
                 if (hasBothRoles) {

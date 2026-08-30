@@ -41,6 +41,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.core.ui.components.CategoryCard
 import com.sosauce.cinnamon.core.ui.components.ImagePickerCard
@@ -63,6 +65,7 @@ fun ConversationTheming(
     onNavigateBack: () -> Unit
 ) {
 
+    println("entity received: ${state.settings}")
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showColorPicker by remember { mutableStateOf(false) }
@@ -73,7 +76,10 @@ fun ConversationTheming(
 
             scope.launch(Dispatchers.IO) {
 
-                File(state.settings.wallpaper).delete()
+
+                state.settings.wallpaper?.path?.let {
+                    File(it).delete()
+                }
 
                 val file = File(
                     context.filesDir,
@@ -87,7 +93,7 @@ fun ConversationTheming(
                 onHandleConversationSettingsActions(
                     ConversationSettingActions.UpsertConversationSettings(
                         state.settings.copy(
-                            wallpaper = file.path
+                            wallpaper = file.toUri()
                         )
                     )
                 )
@@ -117,7 +123,7 @@ fun ConversationTheming(
                         onHandleConversationSettingsActions(
                             ConversationSettingActions.UpsertConversationSettings(
                                 state.settings.copy(
-                                    color = newColor.toArgb()
+                                    color = newColor
                                 )
                             )
                         )
@@ -129,6 +135,9 @@ fun ConversationTheming(
             }
         )
     }
+
+    println("theming wallpaper: ${state.settings.wallpaper}")
+
 
     Scaffold(
         bottomBar = {
@@ -151,17 +160,21 @@ fun ConversationTheming(
                 onClick = { imagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                 onRemoveImage = {
                     scope.launch(Dispatchers.IO) {
-                        File(context.filesDir, state.settings.wallpaper).delete()
+
+                        state.settings.wallpaper?.path?.let {
+                            File(context.filesDir, it).delete()
+                        }
+
                         onHandleConversationSettingsActions(
                             ConversationSettingActions.UpsertConversationSettings(
                                 state.settings.copy(
-                                    wallpaper = ""
+                                    wallpaper = null
                                 )
                             )
                         )
                     }
                 },
-                imagePath = state.settings.wallpaper,
+                image = state.settings.wallpaper,
                 blur = state.settings.wallpaperBlurIntensity,
                 modifier = Modifier
                     .selfAlignHorizontally()
@@ -171,7 +184,7 @@ fun ConversationTheming(
             )
 
             AnimatedVisibility(
-                visible = state.settings.wallpaper.isNotEmpty()
+                visible = state.settings.wallpaper != null
             ) {
                 var tempSliderValue by remember { mutableStateOf<Float?>(null) }
                 val value = tempSliderValue ?: state.settings.wallpaperBlurIntensity.toFloat()
@@ -208,8 +221,7 @@ fun ConversationTheming(
             HeaderText(
                 text = stringResource(R.string.chat_color)
             )
-            val color =
-                if (state.settings.color != -1) Color(state.settings.color) else MaterialTheme.colorScheme.surfaceContainer
+            val color = state.settings.color ?: MaterialTheme.colorScheme.surfaceContainer
             Card(
                 onClick = { showColorPicker = true },
                 shape = RoundedCornerShape(24.dp),
@@ -226,7 +238,7 @@ fun ConversationTheming(
                     contentAlignment = Alignment.Center
                 ) {
                     val icon =
-                        if (state.settings.color != -1) R.drawable.edit_filled else R.drawable.colorize
+                        if (state.settings.color != null) R.drawable.edit_filled else R.drawable.colorize
 
                     Icon(
                         painter = painterResource(icon),

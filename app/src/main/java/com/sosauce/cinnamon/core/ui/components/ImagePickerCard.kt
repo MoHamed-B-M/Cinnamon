@@ -1,5 +1,6 @@
 package com.sosauce.cinnamon.core.ui.components
 
+import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -28,7 +29,7 @@ fun ImagePickerCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onRemoveImage: () -> Unit,
-    imagePath: String,
+    image: Uri?,
     blur: Int = 0
 ) {
     Box(modifier = modifier) {
@@ -41,7 +42,7 @@ fun ImagePickerCard(
             shape = RoundedCornerShape(24.dp),
 
             ) {
-            if (imagePath.isEmpty()) {
+            if (image == null) {
                 Icon(
                     painter = painterResource(R.drawable.add),
                     contentDescription = null,
@@ -51,7 +52,7 @@ fun ImagePickerCard(
                 )
             } else {
                 AsyncImage(
-                    model = imagePath,
+                    model = image,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -62,7 +63,7 @@ fun ImagePickerCard(
         }
 
         AnimatedVisibility(
-            visible = imagePath.isNotEmpty(),
+            visible = image != null,
             enter = scaleIn(),
             exit = scaleOut(),
             modifier = Modifier.align(Alignment.TopEnd)

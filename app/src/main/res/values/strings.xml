@@ -156,6 +156,11 @@
     <string name="android_16_warning">On Android 16 and above, you\'ll have to allow restricted permissions in order to use the app. Click this card to learn how.</string>
     <string name="better_luck_next_time">Better luck next time!</string>
     <string name="failed_to_save_mms">Failed to save MMS to device!</string>
+    <string name="blocked_multiple">Blocked %1$s and %2$d more</string>
+    <string name="blocked_one">Blocked %1$s</string>
+    <string name="block_multiple_fail">Couldn\'t block %1$s and %2$d more</string>
+    <string name="block_one_fail">Couldn\'t block %1$s</string>
+    <string name="are_you_sure_irreversible">Are you sure? This cannot be undone!</string>
 
 
     <plurals name="delete_msg">

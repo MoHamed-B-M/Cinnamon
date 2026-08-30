@@ -69,6 +69,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
+import androidx.core.net.toUri
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import coil3.compose.AsyncImage
 import com.sosauce.cinnamon.R
@@ -77,7 +78,7 @@ import com.sosauce.cinnamon.core.ui.components.buttons.CuteNavigationButtonSurfa
 import com.sosauce.cinnamon.features.contacts.data.local.contactSettings.ContactSettingsActions
 import com.sosauce.cinnamon.features.contacts.data.model.CuteContact
 import com.sosauce.cinnamon.core.utils.SharedTransitionKeys
-import com.sosauce.cinnamon.core.utils.bouncySpec
+import com.sosauce.nekobites.animations.bouncySpec
 import com.sosauce.cinnamon.core.utils.copyMutate
 import com.sosauce.nekobites.animations.AnimatedFab
 import kotlinx.coroutines.Dispatchers
@@ -196,7 +197,7 @@ fun SharedTransitionScope.EditContactScreen(
                                 )
                             }
                         },
-                        imagePath = state.settings.poster,
+                        image = state.settings.poster.ifEmpty { null }?.toUri(),
                         modifier = Modifier
                             .height(250.dp)
                             .width(150.dp)

@@ -770,42 +770,6 @@ fun TextFieldState.backspace() {
     }
 }
 
-fun <T> bouncySpec() = spring<T>(
-    dampingRatio = Spring.DampingRatioMediumBouncy,
-    stiffness = Spring.StiffnessLow
-)
-
-fun <T> bouncySpecNavigation() = spring<T>(
-    dampingRatio = Spring.DampingRatioLowBouncy,
-    stiffness = Spring.StiffnessLow
-)
-
-/**
- * It can also take emails
- */
-suspend fun Context.blockNumbers(numbers: List<String>) = withContext(Dispatchers.IO) {
-    val ops = ArrayList<ContentProviderOperation>()
-
-    numbers.fastForEach { number ->
-        ops.add(
-            ContentProviderOperation.newInsert(BlockedNumbers.CONTENT_URI)
-                .withValue(BlockedNumbers.COLUMN_ORIGINAL_NUMBER, number)
-                .build()
-        )
-    }
-    try {
-        contentResolver.applyBatch(BlockedNumberContract.AUTHORITY, ops)
-    } catch (_: Exception) {
-        withContext(Dispatchers.Main) {
-
-            val text = if (numbers.size > 1) {
-                "Couldn't block ${numbers.first()} and ${numbers.size - 1} more"
-            } else "Couldn't block ${numbers.first()}"
-
-            Toast.makeText(this@blockNumbers, text, Toast.LENGTH_SHORT).show()
-        }
-    }
-}
 
 
 fun String.isShortCode(): Boolean {

@@ -25,7 +25,6 @@ import androidx.navigation3.ui.NavDisplay
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.app.navigation.SettingsScreens
 import com.sosauce.cinnamon.core.ui.components.buttons.CuteNavigationButton
-import com.sosauce.cinnamon.core.utils.bouncySpecNavigation
 import com.sosauce.cinnamon.core.utils.navigateBack
 import com.sosauce.cinnamon.settings.components.AboutCard
 import com.sosauce.cinnamon.settings.components.SettingsCategoryCard
@@ -101,28 +100,28 @@ fun SettingsScreen(
                     backStack.navigateBack()
                 }
             },
-            transitionSpec = {
-                ContentTransform(
-                    targetContentEnter = slideInHorizontally(bouncySpecNavigation()) { it } + fadeIn(),
-                    initialContentExit = fadeOut()
-                )
-            },
-            popTransitionSpec = {
-                ContentTransform(
-                    targetContentEnter = slideInHorizontally(bouncySpecNavigation()) { -it } + fadeIn(),
-                    initialContentExit = fadeOut()
-                )
-            },
-            predictivePopTransitionSpec = {
-                ContentTransform(
-                    fadeIn(),
-                    slideOutHorizontally(bouncySpecNavigation()) { it },
-                )
-            },
             entryDecorators = listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),
                 rememberViewModelStoreNavEntryDecorator()
             ),
+            transitionSpec = {
+                ContentTransform(
+                    targetContentEnter = slideInHorizontally { it } + fadeIn(),
+                    initialContentExit = slideOutHorizontally { -it / 4 } + fadeOut()
+                )
+            },
+            predictivePopTransitionSpec = {
+                ContentTransform(
+                    targetContentEnter = slideInHorizontally { -it / 4 } + fadeIn(),
+                    initialContentExit = slideOutHorizontally { it } + fadeOut()
+                )
+            },
+            popTransitionSpec = {
+                ContentTransform(
+                    targetContentEnter = slideInHorizontally { -it / 4 } + fadeIn(),
+                    initialContentExit = slideOutHorizontally { it } + fadeOut()
+                )
+            },
             entryProvider = entryProvider {
 
                 entry<SettingsScreens.Settings> {

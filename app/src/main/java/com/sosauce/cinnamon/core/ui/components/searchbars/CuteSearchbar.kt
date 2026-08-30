@@ -157,18 +157,18 @@ fun CuteSearchbar(
                                                         onClick = {
                                                             isInScreenSelectionMode = true
                                                         },
-                                                        shapes = IconButtonDefaults.shapes(),
-                                                        modifier = Modifier
-                                                            .sharedElement(
-                                                                sharedContentState = rememberSharedContentState(
-                                                                    icon
-                                                                ),
-                                                                animatedVisibilityScope = LocalNavAnimatedContentScope.current
-                                                            )
+                                                        shapes = IconButtonDefaults.shapes()
                                                     ) {
                                                         Icon(
                                                             painter = painterResource(icon),
-                                                            contentDescription = null
+                                                            contentDescription = null,
+                                                            modifier = Modifier
+                                                                .sharedElement(
+                                                                    sharedContentState = rememberSharedContentState(
+                                                                        icon
+                                                                    ),
+                                                                    animatedVisibilityScope = LocalNavAnimatedContentScope.current
+                                                                )
                                                         )
                                                     }
                                                 }

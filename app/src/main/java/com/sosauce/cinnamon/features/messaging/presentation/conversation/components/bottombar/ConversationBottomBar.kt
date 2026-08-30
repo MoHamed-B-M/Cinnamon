@@ -82,7 +82,7 @@ import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.core.datastore.rememberShowCharCount
 import com.sosauce.cinnamon.features.messaging.data.local.scheduledMessages.ScheduledMessageEntity
 import com.sosauce.cinnamon.app.providers.ComposeFileProvider
-import com.sosauce.cinnamon.core.utils.bouncySpec
+import com.sosauce.nekobites.animations.bouncySpec
 import com.sosauce.cinnamon.core.utils.selfAlignHorizontally
 import com.sosauce.cinnamon.core.utils.toDateAndTime
 import com.sosauce.cinnamon.features.messaging.presentation.conversation.ConversationActions

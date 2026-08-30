@@ -1,12 +1,16 @@
 package com.sosauce.cinnamon.core.telephony.message
 
 import android.app.PendingIntent
+import android.content.ContentProviderOperation
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.provider.BlockedNumberContract
+import android.provider.BlockedNumberContract.BlockedNumbers
 import android.provider.Telephony
 import android.telephony.SmsManager
+import android.widget.Toast
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
@@ -35,21 +39,6 @@ class CuteTelephonyManager(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             context.getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
         } else SmsManager.getSmsManagerForSubscriptionId(subId)
-    }
-
-
-    suspend fun markConversationAsRead(threadId: Long) = withContext(Dispatchers.IO) {
-        val contentValues = contentValuesOf(
-            Telephony.Sms.READ to 1
-        )
-        val selection = "${Telephony.Sms.THREAD_ID} = ?"
-
-        context.contentResolver.update(
-            Telephony.Sms.CONTENT_URI,
-            contentValues,
-            selection,
-            arrayOf(threadId.toString())
-        )
     }
 
 
@@ -172,6 +161,28 @@ class CuteTelephonyManager(
         )
 
         context.contentResolver.insert(Telephony.Sms.CONTENT_URI, values)
+    }
+
+    /**
+     * It can also take emails
+     * @return Whether blocking was successful
+     */
+    suspend fun blockNumbers(numbers: List<String>): Boolean = withContext(Dispatchers.IO) {
+        val ops = ArrayList<ContentProviderOperation>()
+
+        numbers.fastForEach { number ->
+            ops.add(
+                ContentProviderOperation.newInsert(BlockedNumbers.CONTENT_URI)
+                    .withValue(BlockedNumbers.COLUMN_ORIGINAL_NUMBER, number)
+                    .build()
+            )
+        }
+        return@withContext try {
+            context.contentResolver.applyBatch(BlockedNumberContract.AUTHORITY, ops)
+            true
+        } catch (_: Exception) {
+            false
+        }
     }
 
 }

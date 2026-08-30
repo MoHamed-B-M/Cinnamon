@@ -49,7 +49,7 @@ import com.sosauce.cinnamon.core.ui.components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.features.contacts.presentation.ContactListItem
 import com.sosauce.cinnamon.features.contacts.presentation.components.dialogs.NumberPickerDialog
 import com.sosauce.cinnamon.core.utils.LazyListKeys
-import com.sosauce.cinnamon.core.utils.bouncySpec
+import com.sosauce.nekobites.animations.bouncySpec
 import com.sosauce.cinnamon.core.utils.getThreadIdOrCreate
 import com.sosauce.cinnamon.core.utils.selfAlignHorizontally
 import com.sosauce.nekobites.components.NoXFound

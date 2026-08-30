@@ -9,7 +9,6 @@ import com.sosauce.cinnamon.features.contacts.data.local.contactSettings.Contact
 import com.sosauce.cinnamon.features.contacts.data.local.contactSettings.ContactSettingsDao
 import com.sosauce.cinnamon.features.contacts.data.repository.ContactsRepository
 import com.sosauce.cinnamon.features.contacts.data.model.CuteContact
-import com.sosauce.cinnamon.core.utils.blockNumbers
 import com.sosauce.cinnamon.core.utils.observe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -107,12 +106,9 @@ class ContactDetailsViewModel(
             }
 
             is ContactDetailsAction.BlockContact -> {
-                val toBlock = if (action.emailsToo) {
-                    state.value.contact.details.phoneNumbers.fastMap { it.number } + state.value.contact.details.emails.fastMap { it.email }
-                } else state.value.contact.details.phoneNumbers.fastMap { it.number }
-
                 viewModelScope.launch(Dispatchers.IO) {
-                    application.blockNumbers(toBlock)
+                    val contact = _state.value.contact
+                    contactsRepository.blockContact(contact, action.emailsToo)
                 }
             }
         }

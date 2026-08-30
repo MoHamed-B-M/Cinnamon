@@ -29,9 +29,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.core.ui.components.DefaultContactIcon
-import com.sosauce.cinnamon.core.utils.bouncySpec
+import com.sosauce.nekobites.animations.bouncySpec
 import com.sosauce.cinnamon.features.messaging.domain.CuteMessage
 import com.sosauce.cinnamon.features.messaging.domain.MessageType
+import sv.lib.squircleshape.GentleSquircleShape
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
@@ -80,7 +81,7 @@ fun MessageLayout(
             enter = expandVertically(),
             exit = shrinkVertically(),
             modifier = Modifier
-                .padding(vertical = 3.dp)
+                .padding(5.dp)
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = RoundedCornerShape(50)
@@ -107,8 +108,7 @@ fun MessageLayout(
                 }
                 Text(
                     text = message.time,
-                    style = MaterialTheme.typography.bodyMediumEmphasized,
-                    modifier = Modifier.padding(5.dp)
+                    style = MaterialTheme.typography.bodyMediumEmphasized
                 )
             }
         }
@@ -155,7 +155,7 @@ fun BubbleShape(
             }
         )
 
-        RoundedCornerShape(
+        GentleSquircleShape(
             topStart = 24.dp,
             bottomStart = 24.dp,
             topEnd = topEnd,
@@ -177,7 +177,7 @@ fun BubbleShape(
             }
         )
 
-        RoundedCornerShape(
+        GentleSquircleShape(
             topStart = topStart,
             bottomStart = bottomStart,
             topEnd = 24.dp,

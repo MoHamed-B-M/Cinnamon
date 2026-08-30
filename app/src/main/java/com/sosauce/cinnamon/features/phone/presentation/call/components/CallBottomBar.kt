@@ -44,7 +44,7 @@ import com.sosauce.cinnamon.features.phone.presentation.call.CallAction
 import com.sosauce.cinnamon.features.phone.presentation.call.CallState
 import com.sosauce.cinnamon.features.phone.presentation.call.CallingState
 import com.sosauce.cinnamon.features.phone.presentation.call.DialerPaneContent
-import com.sosauce.cinnamon.core.utils.bouncySpec
+import com.sosauce.nekobites.animations.bouncySpec
 import com.sosauce.cinnamon.core.utils.selfAlignHorizontally
 
 @Composable

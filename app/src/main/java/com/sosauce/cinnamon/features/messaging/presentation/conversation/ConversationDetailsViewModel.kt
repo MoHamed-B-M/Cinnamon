@@ -33,12 +33,15 @@ import com.sosauce.cinnamon.core.telephony.message.CuteTelephonyManager
 import com.sosauce.cinnamon.core.telephony.message.MessageNotificationManager
 import com.sosauce.cinnamon.features.messaging.data.local.conversationSettings.ConversationSettingsEntity
 import com.sosauce.cinnamon.features.messaging.domain.CuteConversation
-import com.sosauce.cinnamon.core.utils.blockNumbers
+import com.sosauce.cinnamon.core.utils.isShortCode
 import com.sosauce.cinnamon.core.utils.observe
 import com.sosauce.cinnamon.features.messaging.data.ScheduledMessageManager
+import com.sosauce.cinnamon.features.messaging.data.model.toConversationSettings
 import com.sosauce.cinnamon.features.messaging.data.model.toCuteConversation
 import com.sosauce.cinnamon.features.messaging.data.model.toCuteMessage
+import com.sosauce.cinnamon.features.messaging.data.model.toEntity
 import com.sosauce.cinnamon.features.messaging.data.repository.ConversationsRepository
+import com.sosauce.cinnamon.features.messaging.domain.ConversationSettings
 import com.sosauce.cinnamon.features.messaging.domain.CuteMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -90,18 +93,23 @@ class ConversationDetailsViewModel(
     }
     private val settings = conversationSettingsDao
         .getConversationSettings(threadId)
-        .mapLatest { it ?: ConversationSettingsEntity(threadId) }
+        .mapLatest { (it ?: ConversationSettingsEntity(threadId = threadId)).toConversationSettings() }
 
     val state = combine(
         messages,
         conversation,
         settings
     ) { messages, conversation, settings ->
+
+
+        println("Settings in state: $settings, threadId: ${conversation.threadId}")
+
         ConversationDetailsState(
             messages = messages,
             conversation = conversation,
             settings = settings,
-            isLoading = false
+            isLoading = false,
+            isShortCode = conversation.participants.first().rawNumber.isShortCode()
         )
     }.stateIn(
         viewModelScope,
@@ -121,7 +129,7 @@ class ConversationDetailsViewModel(
         when (action) {
             is ConversationSettingActions.UpsertConversationSettings -> {
                 viewModelScope.launch(Dispatchers.IO) {
-                    conversationSettingsDao.upsertConversation(action.conversationSettingsEntity)
+                    conversationSettingsDao.upsertConversation(action.conversationSettings.toEntity())
                 }
             }
         }
@@ -131,7 +139,7 @@ class ConversationDetailsViewModel(
         when (action) {
             is ConversationActions.MarkAsRead -> {
                 viewModelScope.launch {
-                    cuteTelephonyManager.markConversationAsRead(threadId)
+                    conversationsRepository.markConversationAsRead(threadId)
                 }
             }
 
@@ -168,8 +176,11 @@ class ConversationDetailsViewModel(
                     if (participantToBlock.isBlocked) {
                         BlockedNumberContract.unblock(application, rawNumber)
                     } else {
-                        application.blockNumbers(
+                        val success = cuteTelephonyManager.blockNumbers(
                             numbers = listOf(rawNumber)
+                        )
+                        _events.trySend(
+                            ConversationDetailsEvents.Block(success, listOf(rawNumber))
                         )
                     }
 
@@ -212,7 +223,7 @@ class ConversationDetailsViewModel(
 data class ConversationDetailsState(
     val isLoading: Boolean = false,
     val conversation: CuteConversation = CuteConversation(),
-    val settings: ConversationSettingsEntity = ConversationSettingsEntity(),
+    val settings: ConversationSettings = ConversationSettings(),
     val messages: Map<String, List<CuteMessage>> = emptyMap(),
     val isShortCode: Boolean = false
 )
@@ -241,4 +252,8 @@ sealed interface ConversationActions {
 
 sealed interface ConversationDetailsEvents {
     data class MmsSave(val success: Boolean) : ConversationDetailsEvents
+    data class Block(
+        val success: Boolean,
+        val numbers: List<String>
+    ) : ConversationDetailsEvents
 }

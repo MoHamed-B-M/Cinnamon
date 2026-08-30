@@ -3,9 +3,12 @@ package com.sosauce.cinnamon.features.contacts.data.repository
 import android.content.ContentProviderOperation
 import android.content.Context
 import android.net.Uri
+import android.provider.BlockedNumberContract
+import android.provider.BlockedNumberContract.BlockedNumbers
 import android.provider.ContactsContract
 import android.widget.Toast
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastMap
 import androidx.core.net.toUri
 import com.sosauce.cinnamon.features.contacts.data.model.CuteContact
 import com.sosauce.cinnamon.features.contacts.data.model.CuteContactDetails
@@ -699,6 +702,32 @@ class ContactsRepository(
             )
         }
         context.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
+    }
+
+    suspend fun blockContact(
+        contact: CuteContact,
+        emails: Boolean
+    ): Boolean = withContext(Dispatchers.IO) {
+        val toBlock = if (emails) {
+            contact.details.phoneNumbers.fastMap { it.number } + contact.details.emails.fastMap { it.email }
+        } else contact.details.phoneNumbers.fastMap { it.number }
+
+        val ops = ArrayList<ContentProviderOperation>()
+
+        toBlock.fastForEach { number ->
+            ops.add(
+                ContentProviderOperation.newInsert(BlockedNumbers.CONTENT_URI)
+                    .withValue(BlockedNumbers.COLUMN_ORIGINAL_NUMBER, number)
+                    .build()
+            )
+        }
+        return@withContext try {
+            context.contentResolver.applyBatch(BlockedNumberContract.AUTHORITY, ops)
+            true
+        } catch (_: Exception) {
+            false
+        }
+
     }
 
 

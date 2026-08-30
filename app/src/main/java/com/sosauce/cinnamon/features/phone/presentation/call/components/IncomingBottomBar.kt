@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.features.phone.presentation.call.CallAction
 import com.sosauce.cinnamon.core.ui.CinnamonTheme
-import com.sosauce.cinnamon.core.utils.bouncySpec
+import com.sosauce.nekobites.animations.bouncySpec
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 

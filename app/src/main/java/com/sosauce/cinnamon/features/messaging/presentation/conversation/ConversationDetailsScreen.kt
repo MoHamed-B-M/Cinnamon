@@ -68,7 +68,7 @@ import com.sosauce.cinnamon.features.messaging.presentation.conversation.compone
 import com.sosauce.cinnamon.features.messaging.presentation.conversation.components.topbars.ConversationTopBar
 import com.sosauce.cinnamon.features.phone.presentation.call.CallAction
 import com.sosauce.cinnamon.core.utils.SharedTransitionKeys
-import com.sosauce.cinnamon.core.utils.bouncySpec
+import com.sosauce.nekobites.animations.bouncySpec
 import com.sosauce.cinnamon.core.utils.isEmoji
 import com.sosauce.cinnamon.features.messaging.domain.CuteMessage
 import com.sosauce.cinnamon.features.messaging.domain.MessageType
@@ -79,6 +79,8 @@ import com.sosauce.cinnamon.features.messaging.presentation.conversation.compone
 import com.sosauce.cinnamon.features.messaging.presentation.conversation.components.bubble.MmsBubble
 import com.sosauce.cinnamon.features.messaging.presentation.conversation.components.bubble.SandwichPosition
 import com.sosauce.cinnamon.features.messaging.presentation.conversation.components.topbars.SelectedTopBar
+import com.sosauce.nekobites.animations.unclippedContentTransform
+import com.sosauce.nekobites.components.LoadingBox
 import com.sosauce.sweetselect.rememberSweetSelectState
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 
@@ -94,34 +96,28 @@ fun SharedTransitionScope.ConversationDetailsScreen(
     onNavigateUp: () -> Unit,
     onNavigate: (Screen) -> Unit
 ) {
+    val listState = rememberLazyListState()
+    val sweetSelectState = rememberSweetSelectState<CuteMessage>()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    if (state.isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            ContainedLoadingIndicator()
-        }
-    } else {
-        val listState = rememberLazyListState()
-        val sweetSelectState = rememberSweetSelectState<CuteMessage>()
-        val lifecycleOwner = LocalLifecycleOwner.current
+    RetainedEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_CREATE, Lifecycle.Event.ON_RESUME, Lifecycle.Event.ON_START -> ActiveThreadId.threadId =
+                    state.conversation.threadId
 
-        RetainedEffect(lifecycleOwner) {
-            val observer = LifecycleEventObserver { _, event ->
-                when (event) {
-                    Lifecycle.Event.ON_CREATE, Lifecycle.Event.ON_RESUME, Lifecycle.Event.ON_START -> ActiveThreadId.threadId =
-                        state.conversation.threadId
-
-                    else -> ActiveThreadId.threadId = null
-                }
+                else -> ActiveThreadId.threadId = null
             }
-            lifecycleOwner.lifecycle.addObserver(observer)
-            onRetire { lifecycleOwner.lifecycle.removeObserver(observer) }
         }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onRetire { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
-        LaunchedEffect(state.messages) { listState.animateScrollToItem(0) }
+    LaunchedEffect(state.messages) { listState.animateScrollToItem(0) }
 
+    LoadingBox(
+        isLoading = state.isLoading
+    ) {
         Scaffold(
             topBar = {
                 AnimatedContent(
@@ -202,8 +198,7 @@ fun SharedTransitionScope.ConversationDetailsScreen(
                         )
                 )
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                     state = listState,
                     contentPadding = paddingValues,
                     reverseLayout = true

@@ -47,7 +47,7 @@ import com.sosauce.cinnamon.features.phone.presentation.call.components.CallBott
 import com.sosauce.cinnamon.features.phone.presentation.call.components.IncomingBottomBar
 import com.sosauce.cinnamon.core.ui.CinnamonTheme
 import com.sosauce.cinnamon.core.ui.components.DefaultContactIcon
-import com.sosauce.cinnamon.core.utils.bouncySpec
+import com.sosauce.nekobites.animations.bouncySpec
 import com.sosauce.cinnamon.core.utils.toStopwatch
 import kotlin.time.DurationUnit
 

@@ -47,6 +47,7 @@ import com.sosauce.cinnamon.features.messaging.presentation.conversation.Convers
 import com.sosauce.sweetselect.SweetSelectState
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,7 +55,7 @@ fun SelectedTopBar(
     sweetSelectState: SweetSelectState<CuteMessage>,
     onSelectAll: () -> Unit,
     onUnselectAll: () -> Unit,
-    onHandleConversationActions: (com.sosauce.cinnamon.features.messaging.presentation.conversation.ConversationActions) -> Unit
+    onHandleConversationActions: (ConversationActions) -> Unit
 ) {
 
     val clipboard = LocalClipboard.current
@@ -74,7 +75,9 @@ fun SelectedTopBar(
                 )
             },
             text = {
-                Text("Are you sure? This cannot be undone!")
+                Text(
+                    text = stringResource(R.string.are_you_sure_irreversible)
+                )
             },
             icon = {
                 Icon(
@@ -114,12 +117,6 @@ fun SelectedTopBar(
             .statusBarsPadding()
             .clip(FloatingToolbarDefaults.ContainerShape)
             .background(MaterialTheme.colorScheme.surfaceContainer),
-//            .hazeEffect(
-//                state = LocalHazeState.current,
-//                style = HazeMaterials.regular(
-//                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-//                )
-//            ),
         colors = FloatingToolbarDefaults.standardFloatingToolbarColors(
             toolbarContainerColor = Color.Transparent
         ),
@@ -143,17 +140,18 @@ fun SelectedTopBar(
             AnimatedVisibility(sweetSelectState.selectedItems.size == 1) {
                 IconButton(
                     onClick = {
+                        val message = sweetSelectState.selectedItems.firstOrNull()?.body ?: return@IconButton
                         scope.launch(Dispatchers.IO) {
                             clipboard.setClipEntry(
                                 ClipEntry(
                                     ClipData.newPlainText(
                                         "",
-                                        sweetSelectState.selectedItems.first().body
+                                        message
                                     )
                                 )
                             )
-                            onUnselectAll()
                         }
+                        onUnselectAll()
                     }
                 ) {
                     Icon(

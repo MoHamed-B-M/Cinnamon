@@ -2,12 +2,16 @@
 
 package com.sosauce.cinnamon.core.ui
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -15,8 +19,10 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import com.materialkolor.DynamicMaterialExpressiveTheme
 import com.materialkolor.dynamiccolor.ColorSpec
 import com.materialkolor.rememberDynamicColorScheme
+import com.materialkolor.rememberDynamicMaterialThemeState
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.core.datastore.rememberAppTheme
 import com.sosauce.cinnamon.core.datastore.rememberPaletteStyle
@@ -30,16 +36,45 @@ fun CinnamonTheme(
     content: @Composable () -> Unit
 ) {
 
+    val activity = LocalActivity.current
+    val window = activity?.window
 
-    val context = LocalContext.current
     val theme by rememberAppTheme()
     val isSystemInDarkTheme = isSystemInDarkTheme()
     val useSystemFont by rememberUseSystemFont()
+    val paletteStyle by rememberPaletteStyle()
+
+    val isDark = when (theme) {
+        CuteTheme.DARK, CuteTheme.AMOLED -> true
+        CuteTheme.SYSTEM -> isSystemInDarkTheme
+        else -> false
+    }
+    val seedColor = rememberSeedColor(
+        isDark = isDark
+    )
+
+    val state = rememberDynamicMaterialThemeState(
+        seedColor = ChatColor.color ?: seedColor,
+        isDark = isDark,
+        isAmoled = theme == CuteTheme.AMOLED,
+        specVersion = ColorSpec.SpecVersion.SPEC_2025,
+        style = paletteStyle.toPaletteStyle()
+    )
+
+    LaunchedEffect(isDark) {
+        if (window == null) return@LaunchedEffect
+
+        SystemUiController.setSystemBarsColors(
+            window = window,
+            isLight = !isDark
+        )
+    }
 
 
-    MaterialExpressiveTheme(
-        colorScheme = defaultColorScheme(),
-        typography = if (useSystemFont) Typography() else NunitoTypography,
+    DynamicMaterialExpressiveTheme(
+        state = state,
+        motionScheme = MotionScheme.expressive(),
+        typography = if (useSystemFont) MaterialTheme.typography else NunitoTypography,
         content = content
     )
 }

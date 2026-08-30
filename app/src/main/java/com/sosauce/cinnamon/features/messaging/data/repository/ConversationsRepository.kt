@@ -11,6 +11,7 @@ import android.provider.Telephony
 import android.provider.Telephony.Mms
 import android.provider.Telephony.MmsSms
 import androidx.compose.ui.util.fastMap
+import androidx.core.content.contentValuesOf
 import androidx.core.net.toUri
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.features.messaging.data.model.CuteConversationEntity
@@ -264,6 +265,20 @@ class ConversationsRepository(private val context: Context) {
             Telephony.Threads.CONTENT_URI,
             "${Telephony.Threads._ID} IN ($placeholders)",
             stringThreadIds
+        )
+    }
+
+    suspend fun markConversationAsRead(threadId: Long) = withContext(Dispatchers.IO) {
+        val contentValues = contentValuesOf(
+            Telephony.Sms.READ to 1
+        )
+        val selection = "${Telephony.Sms.THREAD_ID} = ?"
+
+        context.contentResolver.update(
+            Telephony.Sms.CONTENT_URI,
+            contentValues,
+            selection,
+            arrayOf(threadId.toString())
         )
     }
 
