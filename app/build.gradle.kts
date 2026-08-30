@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+
 androidComponents {
     val release = selector().withBuildType("release")
 
@@ -20,6 +21,8 @@ androidComponents {
 }
 
 android {
+
+
     namespace = "com.sosauce.cinnamon"
     compileSdk {
         version = release(37)
@@ -41,6 +44,21 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val keystoreFile = System.getenv("KEYSTORE_FILE")
+            val keystorePassword = System.getenv("KEYSTORE_PASSWORD")
+            val keyAlias = System.getenv("KEY_ALIAS")
+            val keyPassword = System.getenv("KEY_PASSWORD")
+            if (keystoreFile != null && keystorePassword != null && keyAlias != null && keyPassword != null) {
+                storeFile = file(keystoreFile)
+                storePassword = keystorePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -49,6 +67,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
         debug {
             isDebuggable = true
@@ -114,7 +133,7 @@ dependencies {
     implementation(libs.squircle.shape)
     implementation(libs.lottie.compose)
     implementation(libs.zoomable)
-    implementation("androidx.glance:glance-appwidget:1.2.0")
-    implementation("androidx.glance:glance-material3:1.2.0")
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
     implementation(libs.nekobites)
 }
