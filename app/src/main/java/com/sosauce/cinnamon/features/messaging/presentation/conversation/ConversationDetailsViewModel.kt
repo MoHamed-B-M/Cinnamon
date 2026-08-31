@@ -100,10 +100,6 @@ class ConversationDetailsViewModel(
         conversation,
         settings
     ) { messages, conversation, settings ->
-
-
-        println("Settings in state: $settings, threadId: ${conversation.threadId}")
-
         ConversationDetailsState(
             messages = messages,
             conversation = conversation,

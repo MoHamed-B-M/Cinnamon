@@ -2,6 +2,7 @@
 
 package com.sosauce.cinnamon.features.messaging.data.repository
 
+import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.os.Build
@@ -33,11 +34,62 @@ import kotlin.text.isEmpty
 class ConversationsRepository(private val context: Context) {
 
 
+    fun fetchLatestConversationForThreadId(threadId: Long) = context.contentResolver.observe(Telephony.Threads.CONTENT_URI)
+        .mapLatest { fetchConversationForThreadId(threadId) }
+        .flowOn(Dispatchers.IO)
 
-    fun fetchLatestConversationForThreadId(threadId: Long) = fetchLatestConversations(
-        extraSelection = "${Telephony.Threads._ID} = ?",
-        extraSelectionArgs = arrayOf(threadId.toString())
-    ).mapLatest { it.first() }
+
+    private fun fetchConversationForThreadId(threadId: Long): CuteConversationEntity {
+
+        val projection = arrayOf(
+            Telephony.Threads._ID,
+            Telephony.Threads.SNIPPET,
+            Telephony.Threads.DATE,
+            Telephony.Threads.READ,
+            Telephony.Threads.RECIPIENT_IDS,
+        )
+
+
+        context.contentResolver.query(
+            "${Telephony.Threads.CONTENT_URI}?simple=true".toUri(),
+            projection,
+            "${Telephony.Threads._ID} = ?",
+            arrayOf(threadId.toString()),
+            null,
+        )?.use { cursor ->
+            val idColumn = cursor.getColumnIndexOrThrow(Telephony.Threads._ID)
+            val snippetColumn = cursor.getColumnIndexOrThrow(Telephony.Threads.SNIPPET)
+            val recipientIdColumn = cursor.getColumnIndexOrThrow(Telephony.Threads.RECIPIENT_IDS)
+            val dateColumn = cursor.getColumnIndexOrThrow(Telephony.Threads.DATE)
+            val readColumn = cursor.getColumnIndexOrThrow(Telephony.Threads.READ)
+
+            if (cursor.moveToFirst()) {
+                val threadId = cursor.getLong(idColumn)
+                val recipientIds = cursor.getString(recipientIdColumn).split(" ")
+                val date = cursor.getLong(dateColumn)
+                val read = cursor.getInt(readColumn) != 0
+                val rawRecipients = recipientIds.fastMap { it.getNumberForId() }
+                val systemSnippet = cursor.getString(snippetColumn)
+                val snippet = if (systemSnippet.isNullOrBlank()) {
+                    getMmsThreadSnippet(threadId)
+                } else {
+                    systemSnippet
+                }
+                val participants = rawRecipients.fastMap { getParticipantDetails(it) }
+
+
+                return CuteConversationEntity(
+                    threadId = threadId,
+                    participants = participants,
+                    snippet = snippet,
+                    date = date,
+                    read = read
+                )
+            }
+        }
+
+        return CuteConversationEntity(threadId = threadId)
+    }
 
     fun fetchLatestConversations(
         extraSelection: String? = null,
@@ -62,8 +114,6 @@ class ConversationsRepository(private val context: Context) {
             Telephony.Threads.READ,
             Telephony.Threads.RECIPIENT_IDS,
         )
-
-        Telephony.Sms.Draft.CONTENT_URI
 
         val selection = buildString {
             append("${Telephony.Threads.MESSAGE_COUNT} > ?")

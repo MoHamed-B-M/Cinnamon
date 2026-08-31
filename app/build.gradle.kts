@@ -55,6 +55,8 @@ android {
                 storePassword = keystorePassword
                 this.keyAlias = keyAlias
                 this.keyPassword = keyPassword
+            } else {
+                println("App won't be signed!")
             }
         }
     }
@@ -93,11 +95,13 @@ android {
 }
 
 dependencies {
+    ksp(libs.androidx.room.compiler)
+    implementation(platform(libs.androidx.compose.bom))
+    debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -110,9 +114,7 @@ dependencies {
     implementation(libs.haze)
     implementation(libs.haze.materials)
     implementation(libs.androidx.foundation.layout)
-    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
-    debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.datastore.preferences)
@@ -122,7 +124,6 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui.compose)
     implementation(libs.coil.video)
-    implementation(libs.geocoder)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.paging.runtime)

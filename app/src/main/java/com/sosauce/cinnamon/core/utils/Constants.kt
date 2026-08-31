@@ -68,6 +68,7 @@ object LazyListKeys {
     const val PINNED_CONVERSATIONS = "pinned_conversations"
     const val FAVORITE_CONTACTS = "FAVORITE_CONTACTS"
     const val GROUP_CHAT_BUTTON = "GROUP_CHAT_BUTTON"
+    const val SEND_TO = "SEND_TO"
     const val VOICEMAIL = "VOICEMAIL"
 
 }

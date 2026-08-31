@@ -161,6 +161,7 @@
     <string name="block_multiple_fail">Couldn\'t block %1$s and %2$d more</string>
     <string name="block_one_fail">Couldn\'t block %1$s</string>
     <string name="are_you_sure_irreversible">Are you sure? This cannot be undone!</string>
+    <string name="send_to_number">Send to: %1$s</string>
 
 
     <plurals name="delete_msg">

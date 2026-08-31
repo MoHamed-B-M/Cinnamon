@@ -63,7 +63,8 @@ fun PinnedConversation(
             Text(
                 text = conversation.name,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyLargeEmphasized
             )
             Text(
                 text = conversation.snippet,

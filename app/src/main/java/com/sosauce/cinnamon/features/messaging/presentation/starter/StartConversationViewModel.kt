@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class StartConversationViewModel(
     private val contactsRepository: ContactsRepository
@@ -29,7 +30,7 @@ class StartConversationViewModel(
     private val _state = MutableStateFlow(StartConversationState())
     val state = _state.asStateFlow()
 
-    private val textFieldState = TextFieldState()
+    val textFieldState = TextFieldState()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -39,7 +40,7 @@ class StartConversationViewModel(
                     extraSelection = "${ContactsContract.Contacts.HAS_PHONE_NUMBER} > ?",
                     extraSelectionArgs = arrayOf("0")
                 ),
-                snapshotFlow { textFieldState.text }.debounce(250)
+                snapshotFlow { textFieldState.text }.debounce(250.milliseconds)
             ) { contacts, searchQuery ->
                 contacts
                     .fastFilter {
@@ -52,8 +53,7 @@ class StartConversationViewModel(
             }.collectLatest { contacts ->
                 _state.update {
                     it.copy(
-                        contacts = contacts,
-                        textFieldState = textFieldState
+                        contacts = contacts
                     )
                 }
             }
@@ -85,11 +85,10 @@ class StartConversationViewModel(
 
 
 data class StartConversationState(
+    val isLoading: Boolean = false,
     val contacts: List<CuteContact> = emptyList(),
     val isGroupChatMode: Boolean = false,
-    val selectedNumbers: List<String> = emptyList(),
-    val textFieldState: TextFieldState = TextFieldState(),
-    val isSearching: Boolean = textFieldState.text.isNotEmpty(),
+    val selectedNumbers: List<String> = emptyList()
 )
 
 sealed interface StartConversationActions {

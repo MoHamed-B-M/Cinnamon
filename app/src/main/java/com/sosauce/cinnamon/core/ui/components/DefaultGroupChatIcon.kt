@@ -22,7 +22,7 @@ import com.sosauce.cinnamon.R
 @Composable
 fun DefaultGroupChatIcon(
     modifier: Modifier = Modifier,
-    size: Dp = 42.dp,
+    size: Dp = 50.dp,
     shape: Shape = MaterialShapes.Circle.toShape(),
 ) {
     Box(

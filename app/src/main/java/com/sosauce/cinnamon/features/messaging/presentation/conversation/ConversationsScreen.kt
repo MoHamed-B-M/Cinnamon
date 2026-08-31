@@ -225,8 +225,7 @@ fun LazyListScope.threadsList(
                     }
                 },
                 onLongClick = { sweetSelectState.toggle(conversation) },
-                isSelected = isSelected,
-                onHandleConversationsAction = onHandleConversationsAction
+                isSelected = isSelected
             )
         }
     }

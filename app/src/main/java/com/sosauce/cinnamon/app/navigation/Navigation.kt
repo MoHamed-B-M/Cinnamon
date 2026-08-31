@@ -294,6 +294,7 @@ fun Nav(
 
                         StartConversation(
                             state = state,
+                            textFieldState = viewModel.textFieldState,
                             onNavigateUp = backStack::navigateBack,
                             onNavigate = backStack::add,
                             onToggleGroupChatMode = viewModel::toggleGroupChatMode,

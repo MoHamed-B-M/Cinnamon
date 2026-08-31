@@ -42,13 +42,12 @@ import com.sosauce.cinnamon.features.messaging.domain.CuteConversation
 import com.sosauce.nekobites.components.AnimatedSelectedIcon
 
 @Composable
-fun SharedTransitionScope.Conversation(
+fun Conversation(
     modifier: Modifier = Modifier,
     conversation: CuteConversation,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
-    isSelected: Boolean = false,
-    onHandleConversationsAction: (com.sosauce.cinnamon.features.messaging.presentation.conversation.ConversationsAction) -> Unit
+    isSelected: Boolean = false
 ) {
     val context = LocalContext.current
     var showUnblockDialog by remember { mutableStateOf(false) }

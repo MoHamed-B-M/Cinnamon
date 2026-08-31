@@ -88,7 +88,6 @@ fun CuteSearchbar(
             .imePadding()
 
     ) {
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -117,7 +116,6 @@ fun CuteSearchbar(
                     SharedTransitionLayout {
                         AnimatedContent(
                             targetState = isInScreenSelectionMode,
-                            //transitionSpec = { slideInVertically(bouncySpec()) { it } + fadeIn() togetherWith slideOutVertically(bouncySpec()) { it } + fadeOut() }
                         ) {
                             CompositionLocalProvider(LocalNavAnimatedContentScope provides this) {
                                 if (it) {
@@ -207,9 +205,6 @@ fun CuteSearchbar(
                                                 }
                                             }
                                         },
-                                        textStyle = TextStyle.Default.copy(
-                                            fontFamily = nunitoFontFamily
-                                        ),
                                         lineLimits = TextFieldLineLimits.SingleLine,
                                         shape = FloatingToolbarDefaults.ContainerShape
                                     )
@@ -222,6 +217,11 @@ fun CuteSearchbar(
             }
         }
     }
+}
+
+
+object CuteSearchbarDefaults {
+
 }
 
 
