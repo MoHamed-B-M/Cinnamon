@@ -6,6 +6,8 @@ package com.sosauce.cinnamon.settings.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,11 +23,19 @@ import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.materialkolor.DynamicMaterialExpressiveTheme
+import com.materialkolor.dynamiccolor.ColorSpec
+import com.materialkolor.rememberDynamicMaterialThemeState
+import com.sosauce.cinnamon.core.datastore.rememberAppTheme
 import com.sosauce.cinnamon.core.ui.defaultColorScheme
+import com.sosauce.cinnamon.core.utils.CuteTheme
+import com.sosauce.cinnamon.core.utils.toPaletteStyle
+import com.sosauce.nekobites.components.Spacer
 
 @Composable
 fun PaletteSelector(
@@ -33,12 +43,32 @@ fun PaletteSelector(
     paletteStyle: String,
     onSelectNewPalette: () -> Unit
 ) {
+    val isSystemInDarkTheme = isSystemInDarkTheme()
+    val theme by rememberAppTheme()
+    val isDark = when (theme) {
+        CuteTheme.DARK, CuteTheme.AMOLED -> true
+        CuteTheme.SYSTEM -> isSystemInDarkTheme
+        else -> false
+    }
+
+    val state = rememberDynamicMaterialThemeState(
+        seedColor = MaterialTheme.colorScheme.primary,
+        isDark = isDark,
+        isAmoled = theme == CuteTheme.AMOLED,
+        specVersion = ColorSpec.SpecVersion.SPEC_2025,
+        style = paletteStyle.toPaletteStyle()
+    )
+
     val borderColor by animateColorAsState(
         targetValue = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
     )
+    val textColor by animateColorAsState(
+        targetValue = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface,
+    )
 
-    MaterialExpressiveTheme(
-        colorScheme = defaultColorScheme(palette = paletteStyle)
+    DynamicMaterialExpressiveTheme(
+        state = state,
+        animate = true
     ) {
         val dynamicColors = listOf(
             MaterialTheme.colorScheme.primary,
@@ -48,18 +78,23 @@ fun PaletteSelector(
             MaterialTheme.colorScheme.secondaryContainer,
         )
 
-        SelectorSurface(
-            onClick = onSelectNewPalette
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(onClick = onSelectNewPalette)
+                .padding(5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Column(
                 modifier = Modifier
-                    .padding(10.dp)
-                    .clip(ShapeDefaults.Medium)
+                    .clip(RoundedCornerShape(12.dp))
                     .width(60.dp)
                     .border(
-                        width = if (isSelected) 2.dp else 0.dp,
+                        width = 2.dp,
                         color = borderColor,
-                        shape = ShapeDefaults.Medium
+                        shape = RoundedCornerShape(12.dp)
                     ),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
@@ -73,7 +108,14 @@ fun PaletteSelector(
                     )
                 }
             }
-            Text(paletteStyle)
+
+            Spacer(10.dp)
+            Text(
+                text = paletteStyle,
+                style = MaterialTheme.typography.bodyMediumEmphasized.copy(
+                    color = textColor
+                )
+            )
         }
     }
 }

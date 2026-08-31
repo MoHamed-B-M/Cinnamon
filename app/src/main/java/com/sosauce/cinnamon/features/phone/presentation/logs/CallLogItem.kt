@@ -6,9 +6,12 @@ import android.content.ClipData
 import android.provider.CallLog
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenuGroup
@@ -19,9 +22,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -31,8 +36,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
@@ -40,28 +47,29 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
+import coil3.compose.AsyncImage
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.features.phone.domain.CuteCallLog
 import com.sosauce.cinnamon.app.navigation.Screen
-import com.sosauce.cinnamon.core.ui.components.DefaultContactIcon
 import com.sosauce.cinnamon.core.ui.components.items.CuteListItem
 import com.sosauce.cinnamon.features.phone.presentation.call.CallAction
-import com.sosauce.cinnamon.core.utils.beautifyNumber
 import com.sosauce.cinnamon.core.utils.getItemShape
 import com.sosauce.cinnamon.core.utils.getThreadIdOrCreate
-import com.sosauce.cinnamon.core.utils.secondsToDuration
 import com.sosauce.cinnamon.core.utils.toTime
+import com.sosauce.cinnamon.features.phone.domain.CallPresentation
+import com.sosauce.cinnamon.features.phone.domain.CallType
+import com.sosauce.cinnamon.features.phone.domain.CuteCallLog2
 import com.sosauce.nekobites.animations.AnimatedDrawable
 import com.sosauce.nekobites.animations.AnimatedDrawableFile
 import com.sosauce.nekobites.components.AnimatedSelectedIcon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.text.buildString
 
 
 @Composable
 fun CallLogItem(
     modifier: Modifier = Modifier,
-    callLog: CuteCallLog,
+    callLog: CuteCallLog2,
     isSelected: Boolean,
     numberOfAppearance: Int,
     onClick: () -> Unit,
@@ -76,27 +84,25 @@ fun CallLogItem(
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
     var showMoreOptions by remember { mutableStateOf(false) }
-    val displayNameOrNumber = remember { callLog.cachedName.beautifyNumber() }
     val scale by animateFloatAsState(
         targetValue = if (isSelected) 0.95f else 1f
     )
 
 
     val icon = when (callLog.callType) {
-        CallLog.Calls.INCOMING_TYPE -> R.drawable.arrow_315
-        CallLog.Calls.OUTGOING_TYPE -> R.drawable.arrow_45
-        CallLog.Calls.MISSED_TYPE -> R.drawable.call_missed
-        CallLog.Calls.REJECTED_TYPE -> R.drawable.block
-        else -> R.drawable.block
+        CallType.INCOMING -> R.drawable.arrow_315
+        CallType.OUTGOING -> R.drawable.arrow_45
+        CallType.MISSED -> R.drawable.call_missed
+        CallType.REJECTED -> R.drawable.block
     }
 
 
     val actions = buildList {
-        if (callLog.presentation == CallLog.Calls.PRESENTATION_ALLOWED) {
+        if (callLog.presentation == CallPresentation.ALLOWED) {
             add(
                 CallLogAction(
                     onClick = {
-                        onCallAction(CallAction.LaunchCall(callLog.rawNumber))
+                        onCallAction(CallAction.LaunchCall(callLog.number))
                         showMoreOptions = false
                     },
                     icon = R.drawable.phone,
@@ -107,7 +113,7 @@ fun CallLogItem(
                 CallLogAction(
                     onClick = {
                         scope.launch(Dispatchers.IO) {
-                            val threadId = callLog.rawNumber.getThreadIdOrCreate(context)
+                            val threadId = callLog.number.getThreadIdOrCreate(context)
                             onNavigate(Screen.ConversationDetails(threadId))
                             showMoreOptions = false
                         }
@@ -122,7 +128,7 @@ fun CallLogItem(
                         scope.launch {
                             clipboard.setClipEntry(
                                 ClipEntry(
-                                    ClipData.newPlainText(callLog.rawNumber, callLog.rawNumber)
+                                    ClipData.newPlainText(callLog.number, callLog.number)
                                 )
                             )
                             Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show()
@@ -157,10 +163,37 @@ fun CallLogItem(
             AnimatedSelectedIcon(
                 isSelected = isSelected
             ) {
-                DefaultContactIcon(
-                    firstLetter = displayNameOrNumber.firstOrNull(),
-                    contactPhoneNumber = callLog.rawNumber
-                )
+                Box(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(MaterialShapes.Circle.toShape())
+                        .background(MaterialTheme.colorScheme.primary),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    val firstChar = callLog.displayName.firstOrNull() ?: '?'
+
+                    if (firstChar.isLetter()) {
+                        Text(
+                            text = firstChar.uppercase(),
+                            style = MaterialTheme.typography.titleLargeEmphasized.copy(
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(R.drawable.person_filled),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                    AsyncImage(
+                        model = callLog.photo,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         },
         trailingContent = {
@@ -207,7 +240,7 @@ fun CallLogItem(
         }
     ) {
         Text(
-            text = if (numberOfAppearance <= 1) displayNameOrNumber else "$displayNameOrNumber ($numberOfAppearance)",
+            text = if (numberOfAppearance <= 1) callLog.displayName else "${callLog.displayName} ($numberOfAppearance)",
             maxLines = 1,
             modifier = Modifier.basicMarquee()
         )
@@ -215,7 +248,7 @@ fun CallLogItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             val providedColor =
-                if (callLog.callType == CallLog.Calls.MISSED_TYPE) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+                if (callLog.callType == CallType.MISSED) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
             CompositionLocalProvider(LocalContentColor provides providedColor) {
                 Icon(
                     painter = painterResource(icon),
@@ -225,20 +258,20 @@ fun CallLogItem(
                 Spacer(Modifier.width(5.dp))
                 Text(
                     text = buildString {
-                        append(callLog.date.toTime())
-                        if (callLog.duration > 0 && (callLog.callType == CallLog.Calls.INCOMING_TYPE || callLog.callType == CallLog.Calls.OUTGOING_TYPE)) {
+                        append(callLog.time)
+                        if (callLog.duration != null && (callLog.callType == CallType.INCOMING || callLog.callType == CallType.OUTGOING)) {
                             append(" · ")
-                            append(callLog.duration.secondsToDuration())
+                            append(callLog.duration)
                         }
                     },
                     modifier = Modifier.basicMarquee(),
                     style = MaterialTheme.typography.bodyMediumEmphasized
                 )
             }
-            callLog.location?.let { country ->
+            callLog.location?.let { location ->
                 Spacer(Modifier.weight(1f))
                 Text(
-                    text = country,
+                    text = location,
                     style = MaterialTheme.typography.bodySmallEmphasized.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

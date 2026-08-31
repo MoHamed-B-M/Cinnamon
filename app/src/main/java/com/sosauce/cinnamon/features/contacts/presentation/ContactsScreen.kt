@@ -40,6 +40,7 @@ import com.sosauce.cinnamon.core.ui.components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.core.utils.LazyListKeys
 import com.sosauce.cinnamon.core.utils.selfAlignHorizontally
 import com.sosauce.nekobites.animations.AnimatedFab
+import com.sosauce.nekobites.components.LoadingBox
 import com.sosauce.nekobites.components.NoXFound
 import com.sosauce.sweetselect.rememberSweetSelectState
 import kotlin.uuid.ExperimentalUuidApi
@@ -54,6 +55,8 @@ fun SharedTransitionScope.ContactsScreen(
 
     var sortContactsAscending by rememberSortContactsAscending()
     val sweetSelectState = rememberSweetSelectState<CuteContact>()
+
+
 
 
     if (state.isLoading) {
@@ -135,83 +138,44 @@ fun SharedTransitionScope.ContactsScreen(
                 }
             }
         ) { paddingValues ->
-            LazyColumn(
-                contentPadding = paddingValues
+
+            LoadingBox(
+                isLoading = state.isLoading
             ) {
-                if (state.contacts.isNotEmpty()) {
+                LazyColumn(
+                    contentPadding = paddingValues
+                ) {
+                    if (state.contacts.isNotEmpty()) {
 
-                    val (favorites, nonFavorites) = state.contacts.partition { it.isFavorite }
+                        val (favorites, nonFavorites) = state.contacts.partition { it.isFavorite }
 
-                    if (favorites.isNotEmpty()) {
-                        item(LazyListKeys.FAVORITE_CONTACTS) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.favorite_filled),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(Modifier.width(5.dp))
-                                Text(
-                                    text = pluralStringResource(
-                                        R.plurals.favorites,
-                                        favorites.size
-                                    ),
-                                    style = MaterialTheme.typography.bodyLargeEmphasized.copy(
-                                        color = MaterialTheme.colorScheme.primary
-                                    ),
-                                    modifier = Modifier.animateItem()
-                                )
-                            }
-                        }
-                        items(
-                            items = favorites,
-                            key = { contact -> contact.id }
-                        ) { contact ->
-
-                            val isSelected by sweetSelectState.isSelectedAsState(contact)
-
-                            ContactListItem(
-                                modifier = Modifier.animateItem(),
-                                contact = contact,
-                                isSelected = isSelected,
-                                onClick = {
-                                    if (sweetSelectState.isInSelectionMode) {
-                                        sweetSelectState.toggle(contact)
-                                    } else {
-                                        onNavigate(Screen.ContactDetails(contact.id))
-                                    }
-                                },
-                                onLongClick = { sweetSelectState.toggle(contact) },
-                                showNumber = false
-                            )
-                        }
-                    }
-
-
-                    nonFavorites.groupBy { it.displayName.firstOrNull()?.uppercaseChar() ?: '#' }
-                        .forEach { (letter, contacts) ->
-                            item(
-                                key = letter
-                            ) {
-                                Text(
-                                    text = letter.toString(),
-                                    style = MaterialTheme.typography.bodyLargeEmphasized.copy(
-                                        color = MaterialTheme.colorScheme.primary
-                                    ),
-                                    modifier = Modifier
-                                        .padding(
-                                            horizontal = 20.dp,
-                                            vertical = 10.dp
-                                        )
-                                        .animateItem()
-                                )
+                        if (favorites.isNotEmpty()) {
+                            item(LazyListKeys.FAVORITE_CONTACTS) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.favorite_filled),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp),
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                    Spacer(Modifier.width(5.dp))
+                                    Text(
+                                        text = pluralStringResource(
+                                            R.plurals.favorites,
+                                            favorites.size
+                                        ),
+                                        style = MaterialTheme.typography.bodyLargeEmphasized.copy(
+                                            color = MaterialTheme.colorScheme.primary
+                                        ),
+                                        modifier = Modifier.animateItem()
+                                    )
+                                }
                             }
                             items(
-                                items = contacts,
+                                items = favorites,
                                 key = { contact -> contact.id }
                             ) { contact ->
 
@@ -233,16 +197,61 @@ fun SharedTransitionScope.ContactsScreen(
                                 )
                             }
                         }
-                } else {
-                    item {
-                        NoXFound(
-                            headlineText = R.string.no_contacts_found,
-                            bodyText = R.string.no_contacts_found_desc,
-                            icon = R.drawable.contacts
-                        )
+
+
+                        nonFavorites.groupBy { it.displayName.firstOrNull()?.uppercaseChar() ?: '#' }
+                            .forEach { (letter, contacts) ->
+                                item(
+                                    key = letter
+                                ) {
+                                    Text(
+                                        text = letter.toString(),
+                                        style = MaterialTheme.typography.bodyLargeEmphasized.copy(
+                                            color = MaterialTheme.colorScheme.primary
+                                        ),
+                                        modifier = Modifier
+                                            .padding(
+                                                horizontal = 20.dp,
+                                                vertical = 10.dp
+                                            )
+                                            .animateItem()
+                                    )
+                                }
+                                items(
+                                    items = contacts,
+                                    key = { contact -> contact.id }
+                                ) { contact ->
+
+                                    val isSelected by sweetSelectState.isSelectedAsState(contact)
+
+                                    ContactListItem(
+                                        modifier = Modifier.animateItem(),
+                                        contact = contact,
+                                        isSelected = isSelected,
+                                        onClick = {
+                                            if (sweetSelectState.isInSelectionMode) {
+                                                sweetSelectState.toggle(contact)
+                                            } else {
+                                                onNavigate(Screen.ContactDetails(contact.id))
+                                            }
+                                        },
+                                        onLongClick = { sweetSelectState.toggle(contact) },
+                                        showNumber = false
+                                    )
+                                }
+                            }
+                    } else {
+                        item {
+                            NoXFound(
+                                headlineText = R.string.no_contacts_found,
+                                bodyText = R.string.no_contacts_found_desc,
+                                icon = R.drawable.contacts
+                            )
+                        }
                     }
                 }
             }
+
         }
     }
 }

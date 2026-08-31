@@ -11,10 +11,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sosauce.cinnamon.core.datastore.UserPreferences
 import com.sosauce.cinnamon.features.phone.data.repository.DialerRepository
-import com.sosauce.cinnamon.features.phone.domain.CuteCallLog
 import com.sosauce.cinnamon.core.utils.copyMutate
 import com.sosauce.cinnamon.core.utils.groupSubsequentlyBy
 import com.sosauce.cinnamon.core.utils.toDate
+import com.sosauce.cinnamon.features.phone.domain.CallType
+import com.sosauce.cinnamon.features.phone.domain.CuteCallLog2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -37,7 +38,7 @@ class CallLogsViewModel(
 
     private val textFieldState = TextFieldState()
     private val _state = MutableStateFlow(
-        DialerState(
+        CallLogsState(
             isLoading = true,
             textFieldState = textFieldState
         )
@@ -54,27 +55,27 @@ class CallLogsViewModel(
                 userPreferences.sortLogsAscending,
                 userPreferences.groupSubsequentCalls,
                 snapshotFlow { textFieldState.text }.debounce(250.milliseconds)
-            ) { logs, filter, asc, groupSub, searQuery ->
+            ) { logs, filter, asc, groupSub, searchQuery ->
 
-                val filteredLogs = logs.fastFilter { it.cachedName.contains(searQuery, true) }
+                val filteredLogs = logs.fastFilter { it.displayName.contains(searchQuery, true) }
                     .fastFilter { log ->
                         when (filter) {
                             CallLogsFilter.ALL -> true
-                            CallLogsFilter.CONTACTS -> log.cachedName != log.rawNumber // idk if that's the best way to filter contacts
-                            CallLogsFilter.INCOMING -> log.callType == CallLog.Calls.INCOMING_TYPE || log.callType == CallLog.Calls.REJECTED_TYPE
-                            CallLogsFilter.OUTGOING -> log.callType == CallLog.Calls.OUTGOING_TYPE
-                            CallLogsFilter.MISSED -> log.callType == CallLog.Calls.MISSED_TYPE
+                            CallLogsFilter.CONTACTS -> log.displayName != log.number // I don't know if that's the best way to filter contacts
+                            CallLogsFilter.INCOMING -> log.callType == CallType.INCOMING || log.callType == CallType.REJECTED
+                            CallLogsFilter.OUTGOING -> log.callType == CallType.OUTGOING
+                            CallLogsFilter.MISSED -> log.callType == CallType.MISSED
                         }
-                    }.copyMutate {
-                        if (!asc) reverse()
+                    }.apply {
+                        if (!asc) reversed()
                     }
 
                 val groupedLogs = if (groupSub) {
-                    filteredLogs.groupSubsequentlyBy { it.rawNumber }
+                    filteredLogs.groupSubsequentlyBy { it.number }
                 } else filteredLogs.fastMap { it to 1 }
 
 
-                groupedLogs.groupBy { (calls, _) -> calls.date.toDate() }
+                groupedLogs.groupBy { (calls, _) -> calls.date }
 
             }.flowOn(Dispatchers.Default).collectLatest { logs ->
                 _state.update {
@@ -110,7 +111,7 @@ class CallLogsViewModel(
 
 }
 
-data class DialerState(
+data class CallLogsState(
     val isLoading: Boolean = false,
     val callLogs: Map<String, GroupedCalls> = emptyMap(),
     val filter: CallLogsFilter = CallLogsFilter.ALL,
@@ -118,7 +119,7 @@ data class DialerState(
     val isSearching: Boolean = false
 )
 
-typealias GroupedCalls = List<Pair<CuteCallLog, Int>>
+typealias GroupedCalls = List<Pair<CuteCallLog2, Int>>
 
 sealed interface DialerAction {
     data class ChangeFilter(val filter: CallLogsFilter) : DialerAction

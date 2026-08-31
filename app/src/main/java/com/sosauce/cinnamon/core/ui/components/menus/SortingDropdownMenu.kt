@@ -32,6 +32,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.core.utils.rememberInteractionSource
+import com.sosauce.nekobites.animations.AnimatedDrawable
+import com.sosauce.nekobites.animations.AnimatedDrawableFile
 
 @Composable
 fun SortingDropdownMenu(
@@ -49,15 +51,10 @@ fun SortingDropdownMenu(
             onClick = { expanded = !expanded },
             shapes = IconButtonDefaults.shapes()
         ) {
-            AnimatedContent(
-                targetState = expanded
-            ) { isExpanded ->
-                val icon = if (!isExpanded) R.drawable.sort else R.drawable.close
-                Icon(
-                    painter = painterResource(icon),
-                    contentDescription = null
-                )
-            }
+            AnimatedDrawable(
+                drawable = AnimatedDrawableFile.SORT,
+                atEnd = expanded
+            )
         }
         DropdownMenuPopup(
             expanded = expanded,

@@ -106,10 +106,10 @@ fun rememberEnableT9Dialing() = rememberPreference(PreferencesKeys.ENABLE_T9_DIA
 fun rememberSortLogsAscending() = rememberPreference(PreferencesKeys.SORT_LOGS_ASCENDING, true)
 
 @Composable
-fun rememberInitialTab() = rememberPreference(PreferencesKeys.DEFAULT_TAB, DefaultTabOption.MESSAGES)
+fun rememberInitialScreen() = rememberPreference(PreferencesKeys.DEFAULT_TAB, DefaultTabOption.MESSAGES)
 
 @Composable
-fun rememberInitialTabBlocking(): Int {
+fun rememberInitialScreenBlocking(): Int {
     val context = LocalContext.current
 
     return runBlocking {

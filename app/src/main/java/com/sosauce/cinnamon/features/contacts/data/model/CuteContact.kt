@@ -11,6 +11,22 @@ import com.sosauce.cinnamon.features.contacts.data.model.CuteContact.Website
 import kotlinx.serialization.Serializable
 
 
+data class CuteContactEntity(
+    val id: Long,
+    val displayName: String,
+    val thumbnail: String?,
+    val isFavorite: Boolean,
+    val accountName: String,
+    val phoneNumbers: List<ContactPhoneEntity>
+)
+
+data class ContactPhoneEntity(
+    val number: String,
+    val type: Int,
+    val isDefault: Boolean,
+    val isBlocked: Boolean
+)
+
 @Serializable
 data class CuteContactDetails(
     val phoneNumbers: List<Phone> = emptyList(),

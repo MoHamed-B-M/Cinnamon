@@ -162,6 +162,9 @@
     <string name="block_one_fail">Couldn\'t block %1$s</string>
     <string name="are_you_sure_irreversible">Are you sure? This cannot be undone!</string>
     <string name="send_to_number">Send to: %1$s</string>
+    <string name="default_launch_screen">Default launch screen</string>
+    <string name="navigation">Navigation</string>
+    <string name="navigation_desc">Don\'t get lost!</string>
 
 
     <plurals name="delete_msg">

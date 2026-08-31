@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMap
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.core.datastore.rememberSortLogsAscending
-import com.sosauce.cinnamon.features.phone.domain.CuteCallLog
 import com.sosauce.cinnamon.app.navigation.Screen
 import com.sosauce.cinnamon.core.ui.components.NoResult
 import com.sosauce.cinnamon.core.ui.components.SelectedBarSurface
@@ -47,18 +46,21 @@ import com.sosauce.cinnamon.core.ui.components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.features.phone.presentation.call.CallAction
 import com.sosauce.cinnamon.core.utils.LazyListKeys
 import com.sosauce.cinnamon.core.utils.selfAlignHorizontally
+import com.sosauce.cinnamon.features.phone.domain.CallPresentation
+import com.sosauce.cinnamon.features.phone.domain.CuteCallLog2
 import com.sosauce.nekobites.animations.AnimatedFab
+import com.sosauce.nekobites.components.LoadingBox
 import com.sosauce.nekobites.components.NoXFound
 import com.sosauce.sweetselect.rememberSweetSelectState
 
 @Composable
 fun CallLogsScreen(
-    state: DialerState,
+    state: CallLogsState,
     onNavigate: (Screen) -> Unit,
     onHandleCallActions: (CallAction) -> Unit,
     onHandleDialerActions: (DialerAction) -> Unit
 ) {
-    val sweetSelectState = rememberSweetSelectState<CuteCallLog>()
+    val sweetSelectState = rememberSweetSelectState<CuteCallLog2>()
     var sortLogsAscending by rememberSortLogsAscending()
 
     Scaffold(
@@ -171,14 +173,9 @@ fun CallLogsScreen(
         }
     ) { paddingValues ->
 
-        if (state.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                ContainedLoadingIndicator()
-            }
-        } else {
+        LoadingBox(
+            isLoading = state.isLoading
+        ) {
             LazyColumn(
                 contentPadding = paddingValues
             ) {
@@ -250,8 +247,8 @@ fun CallLogsScreen(
                                         if (sweetSelectState.isInSelectionMode) {
                                             sweetSelectState.toggle(callLog)
                                         } else {
-                                            if (callLog.presentation == CallLog.Calls.PRESENTATION_ALLOWED) {
-                                                onHandleCallActions(CallAction.LaunchCall(callLog.rawNumber))
+                                            if (callLog.presentation == CallPresentation.ALLOWED) {
+                                                onHandleCallActions(CallAction.LaunchCall(callLog.number))
                                             }
                                         }
                                     },

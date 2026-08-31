@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.sosauce.cinnamon.features.contacts.data.repository
 
 import android.content.ContentProviderOperation
@@ -14,7 +16,10 @@ import com.sosauce.cinnamon.features.contacts.data.model.CuteContact
 import com.sosauce.cinnamon.features.contacts.data.model.CuteContactDetails
 import com.sosauce.cinnamon.features.contacts.data.model.CuteContactDetailsBuilder
 import com.sosauce.cinnamon.core.utils.observe
+import com.sosauce.cinnamon.features.contacts.data.model.ContactPhoneEntity
+import com.sosauce.cinnamon.features.contacts.data.model.CuteContactEntity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
@@ -30,6 +35,11 @@ class ContactsRepository(
     ) = context.contentResolver.observe(ContactsContract.Contacts.CONTENT_URI).mapLatest {
         fetchContacts(extraSelection, extraSelectionArgs)
     }.flowOn(Dispatchers.IO)
+
+
+//    fun fetchLatestContacts2() = context.contentResolver.observe(ContactsContract.Contacts.CONTENT_URI).mapLatest {
+//        fetchContacts2().fastMap { it.to }
+//    }.flowOn(Dispatchers.IO)
 
     fun fetchLatestContactsDetails(contactId: Long) =
         context.contentResolver.observe(ContactsContract.Data.CONTENT_URI).mapLatest {
@@ -53,6 +63,93 @@ class ContactsRepository(
                 if (!map.containsKey(contactId)) {
                     map[contactId] = cursor.getString(nameCol) ?: "Device"
                 }
+            }
+        }
+        return map
+    }
+
+
+
+    private fun fetchContacts2(): List<CuteContactEntity> {
+
+        val contacts = mutableListOf<CuteContactEntity>()
+
+        val uri = ContactsContract.Contacts.CONTENT_URI
+        val projection = arrayOf(
+            ContactsContract.Contacts._ID,
+            ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
+            ContactsContract.Contacts.PHOTO_THUMBNAIL_URI,
+            ContactsContract.Contacts.STARRED
+        )
+
+        val allPhones = fetchAllPhoneNumbers2()
+
+        val accountNames = fetchAccountNames()
+
+
+        context.contentResolver.query(
+            uri,
+            projection,
+            null,
+            null,
+            "${ContactsContract.Contacts.DISPLAY_NAME_PRIMARY} ASC"
+        )?.use { cursor ->
+            val idCol = cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID)
+            val nameCol = cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
+            val starCol = cursor.getColumnIndexOrThrow(ContactsContract.Contacts.STARRED)
+            val photoCol = cursor.getColumnIndexOrThrow(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI)
+
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idCol)
+                val name = cursor.getString(nameCol) ?: "<unknown>"
+                val photoThumbnail = cursor.getString(photoCol)
+                val accountName = accountNames[id] ?: "Device"
+
+                contacts.add(
+                    CuteContactEntity(
+                        id = id,
+                        displayName = name,
+                        isFavorite = starCol != 0,
+                        thumbnail = photoThumbnail,
+                        accountName = accountName,
+                        phoneNumbers = allPhones.getOrElse(id) { emptyList() }
+                    )
+                )
+            }
+        }
+        return contacts
+    }
+
+    private fun fetchAllPhoneNumbers2(): Map<Long, List<ContactPhoneEntity>> {
+        val map = mutableMapOf<Long, MutableList<ContactPhoneEntity>>()
+        context.contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            arrayOf(
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+                ContactsContract.CommonDataKinds.Phone.NUMBER,
+                ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+                ContactsContract.CommonDataKinds.Phone.IS_PRIMARY,
+            ),
+            null, null, null
+        )?.use { cursor ->
+            val idColumn = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.CONTACT_ID)
+            val numColumn = cursor.getColumnIndexOrThrow( ContactsContract.CommonDataKinds.Phone.NUMBER)
+            val typeColumn = cursor.getColumnIndexOrThrow( ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+            val primColumn = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.IS_PRIMARY)
+
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idColumn)
+                val number = cursor.getString(numColumn)
+                val type = cursor.getInt(typeColumn)
+                val isDefault = cursor.getInt(primColumn) != 0
+                val phone = ContactPhoneEntity(
+                    number = number,
+                    type = type,
+                    isDefault = isDefault,
+                    isBlocked = false
+                )
+
+                map.getOrPut(id) { mutableListOf() }.add(phone)
             }
         }
         return map

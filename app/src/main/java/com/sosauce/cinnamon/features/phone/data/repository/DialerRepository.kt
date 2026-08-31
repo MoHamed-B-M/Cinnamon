@@ -6,10 +6,14 @@ import android.content.ContentProviderOperation
 import android.content.Context
 import android.net.Uri
 import android.provider.CallLog
+import android.provider.ContactsContract
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastMap
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.features.phone.domain.CuteCallLog
 import com.sosauce.cinnamon.core.utils.observe
+import com.sosauce.cinnamon.features.phone.data.model.CuteCallLogEntity
+import com.sosauce.cinnamon.features.phone.data.model.toDomain
+import com.sosauce.cinnamon.features.phone.domain.CuteCallLog2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -22,16 +26,16 @@ class DialerRepository(
     private val context: Context
 ) {
 
-    fun fetchLatestCallLog(): Flow<List<CuteCallLog>> {
+    fun fetchLatestCallLog(): Flow<List<CuteCallLog2>> {
         return context.contentResolver.observe(CallLog.Calls.CONTENT_URI).mapLatest {
-            fetchCallLogs()
+            fetchCallLogs().fastMap { it.toDomain(context) }
         }.flowOn(Dispatchers.IO)
     }
 
 
-    fun fetchCallLogs(): List<CuteCallLog> {
+    fun fetchCallLogs(): List<CuteCallLogEntity> {
 
-        val logs = mutableListOf<CuteCallLog>()
+        val logs = mutableListOf<CuteCallLogEntity>()
 
 
         val projection = arrayOf(
@@ -43,7 +47,7 @@ class DialerRepository(
             CallLog.Calls.NUMBER_PRESENTATION,
             CallLog.Calls.CACHED_NAME,
             CallLog.Calls.GEOCODED_LOCATION,
-            CallLog.Calls.CACHED_PHOTO_ID
+            CallLog.Calls.CACHED_PHOTO_URI
         )
 
 
@@ -63,37 +67,62 @@ class DialerRepository(
             val presentationColumn = cursor.getColumnIndexOrThrow(CallLog.Calls.NUMBER_PRESENTATION)
             val cachedNameColumn = cursor.getColumnIndexOrThrow(CallLog.Calls.CACHED_NAME)
             val locationColumn = cursor.getColumnIndexOrThrow(CallLog.Calls.GEOCODED_LOCATION)
+            val photoColumn =  cursor.getColumnIndexOrThrow(CallLog.Calls.CACHED_PHOTO_URI)
 
             while (cursor.moveToNext()) {
 
                 val id = cursor.getLong(idColumn)
                 val number = cursor.getString(numberColumn)
-                    .ifEmpty { context.getString(R.string.private_number) }
                 val callType = cursor.getInt(callTypeColumn)
                 val date = cursor.getLong(dateColumn)
                 val duration = cursor.getLong(durationColumn)
                 val presentation = cursor.getInt(presentationColumn)
-                val cachedName = (cursor.getString(cachedNameColumn) ?: "").ifEmpty { number }
+                val cachedName = cursor.getString(cachedNameColumn)
                 val location = cursor.getString(locationColumn)
+                val photo = cursor.getString(photoColumn)
 
                 logs.add(
-                    CuteCallLog(
+                    CuteCallLogEntity(
                         id = id,
-                        rawNumber = number,
-                        callType = callType,
+                        number = number.ifEmpty { context.getString(R.string.private_number) },
+                        cachedName = cachedName,
                         date = date,
                         duration = duration,
                         location = location,
                         presentation = presentation,
-                        cachedName = cachedName,
-                        pfp = Uri.EMPTY
-                        //pfp = number.getContactPfpFromNumber(context, false)
+                        type = callType,
+                        photo = photo?.ifEmpty { getLogPhoto(number) } ?: getLogPhoto(number)
                     )
                 )
 
             }
         }
         return logs
+    }
+
+
+    private fun getLogPhoto(number: String): String? {
+        val uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number))
+        val projection = arrayOf(
+            ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI
+        )
+
+        context.contentResolver.query(
+            uri,
+            projection,
+            null,
+            null,
+            null
+        )?.use { cursor ->
+
+            val photoColumn = cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI)
+
+            if (cursor.moveToFirst()) {
+                return cursor.getString(photoColumn)
+            }
+        }
+
+        return null
     }
 
 

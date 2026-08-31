@@ -28,6 +28,7 @@ import com.sosauce.cinnamon.core.ui.components.buttons.CuteNavigationButton
 import com.sosauce.cinnamon.core.utils.navigateBack
 import com.sosauce.cinnamon.settings.components.AboutCard
 import com.sosauce.cinnamon.settings.components.SettingsCategoryCard
+import com.sosauce.cinnamon.settings.components.SettingsNavigation
 
 @Composable
 fun SettingsScreen(
@@ -43,11 +44,17 @@ fun SettingsScreen(
             onNavigate = { backStack.add(SettingsScreens.LookAndFeel) }
         ),
         Item(
-            icon = R.drawable.behavior,
-            name = stringResource(R.string.behavior),
-            description = stringResource(R.string.behavior_desc),
-            onNavigate = { backStack.add(SettingsScreens.Behavior) }
+            icon = R.drawable.navigation,
+            name = stringResource(R.string.navigation),
+            description = stringResource(R.string.navigation_desc),
+            onNavigate = { backStack.add(SettingsScreens.Navigation) }
         ),
+//        Item(
+//            icon = R.drawable.behavior,
+//            name = stringResource(R.string.behavior),
+//            description = stringResource(R.string.behavior_desc),
+//            onNavigate = { backStack.add(SettingsScreens.Behavior) }
+//        ),
         Item(
             icon = R.drawable.message_rounded,
             name = stringResource(R.string.messages),
@@ -143,6 +150,9 @@ fun SettingsScreen(
 
                 entry<SettingsScreens.Messages> {
                     SettingsMessages()
+                }
+                entry<SettingsScreens.Navigation> {
+                    SettingsNavigation()
                 }
                 entry<SettingsScreens.Contacts> {
                     SettingsContacts()

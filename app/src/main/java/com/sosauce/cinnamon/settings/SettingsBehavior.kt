@@ -16,7 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.core.datastore.rememberInitialTab
+import com.sosauce.cinnamon.core.datastore.rememberInitialScreen
 import com.sosauce.cinnamon.core.utils.DefaultTabOption
 import com.sosauce.cinnamon.core.utils.toLocalizedTab
 import com.sosauce.cinnamon.settings.components.DropdownMenuSettingsCard
@@ -25,7 +25,7 @@ import com.sosauce.cinnamon.settings.components.SettingsWithTitle
 @Composable
 fun SettingsBehavior() {
     val context = LocalContext.current
-    var initialTab by rememberInitialTab()
+    var initialTab by rememberInitialScreen()
     val allTabs = listOf(
         DefaultTabOption.MESSAGES,
         DefaultTabOption.CONTACTS,

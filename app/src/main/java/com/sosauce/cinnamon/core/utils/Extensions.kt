@@ -133,25 +133,6 @@ fun Long.toTime(): String {
     return dateTime.format(formatter)
 }
 
-fun Long.secondsToDuration(): String {
-
-    var finalTime = ""
-    val rawSeconds = this
-    val hours = rawSeconds / 3600
-    val minutes = (this % 3600) / 60
-    val seconds = rawSeconds % 60
-
-    if (hours > 0) {
-        finalTime += "${hours}h "
-    }
-
-    if (minutes > 0) {
-        finalTime += "${minutes}m "
-    }
-
-    return "$finalTime${seconds}s"
-}
-
 // I have way too many functions to convert time and date lmao needs cleanup
 fun Long.toStopwatch(
     durationUnit: DurationUnit = DurationUnit.MILLISECONDS

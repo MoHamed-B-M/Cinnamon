@@ -10,10 +10,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -21,10 +19,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.retain.RetainedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
@@ -32,7 +28,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.core.datastore.rememberInitialTabBlocking
+import com.sosauce.cinnamon.core.datastore.rememberInitialScreenBlocking
 import com.sosauce.cinnamon.core.ui.ChatColor
 import com.sosauce.cinnamon.features.messaging.presentation.archived.ArchivedConversationsScreen
 import com.sosauce.cinnamon.features.messaging.presentation.archived.ArchivedConversationsViewModel
@@ -53,7 +49,6 @@ import com.sosauce.cinnamon.features.phone.presentation.voicemail.VoicemailScree
 import com.sosauce.cinnamon.features.phone.presentation.voicemail.VoicemailViewModel
 import com.sosauce.cinnamon.features.messaging.presentation.customization.ConversationTheming
 import com.sosauce.cinnamon.features.messaging.presentation.customization.ThemingViewModel
-import com.sosauce.cinnamon.core.ui.defaultColorScheme
 import com.sosauce.cinnamon.core.utils.LocalHazeState
 import com.sosauce.cinnamon.core.utils.LocalScreen
 import com.sosauce.cinnamon.core.utils.navigateBack
@@ -79,7 +74,7 @@ fun Nav(
 
     val context = LocalContext.current
     val resources = LocalResources.current
-    val initialTab = rememberInitialTabBlocking()
+    val initialTab = rememberInitialScreenBlocking()
     val backStack = rememberNavBackStack(initialTab.tabToScreen())
     val hazeState = rememberHazeState()
 

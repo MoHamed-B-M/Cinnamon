@@ -26,10 +26,9 @@ import com.sosauce.cinnamon.core.utils.CutePaletteStyle
 import com.sosauce.cinnamon.core.utils.CuteTheme
 import com.sosauce.cinnamon.core.utils.anyDarkColorScheme
 import com.sosauce.cinnamon.core.utils.anyLightColorScheme
-import com.sosauce.cinnamon.settings.components.FontSelector
 import com.sosauce.cinnamon.settings.components.PaletteSelector
+import com.sosauce.cinnamon.settings.components.SettingsSelector
 import com.sosauce.cinnamon.settings.components.SettingsWithTitle
-import com.sosauce.cinnamon.settings.components.ThemeSelector
 import com.sosauce.nekobites.components.LazyRowWithScrollButton
 
 @Composable
@@ -39,70 +38,57 @@ fun SettingsLookAndFeel() {
     val isSystemDark = isSystemInDarkTheme()
     var useSystemFont by rememberUseSystemFont()
     var paletteStyle by rememberPaletteStyle()
+    val anyDark = anyDarkColorScheme()
+    val anyLight = anyLightColorScheme()
 
 
     val themeItems = listOf(
         ThemeItem(
             onClick = { theme = CuteTheme.SYSTEM },
-            backgroundColor = if (isSystemDark) anyDarkColorScheme().background else anyLightColorScheme().background,
-            text = stringResource(R.string.system),
+            backgroundColor = if (isSystemDark) anyDark.surface else anyLight.surface,
+            iconColor = if (isSystemDark) anyDark.onSurface else anyLight.onSurface,
+            text = R.string.system,
             isSelected = theme == CuteTheme.SYSTEM,
-            iconAndTint = Pair(
-                R.drawable.system_theme,
-                if (isSystemDark) anyDarkColorScheme().onBackground else anyLightColorScheme().onBackground
-            )
+            icon = R.drawable.system_theme
         ),
         ThemeItem(
             onClick = { theme = CuteTheme.DARK },
-            backgroundColor = anyDarkColorScheme().background,
-            text = stringResource(R.string.dark),
+            backgroundColor = anyDark.surface,
+            iconColor = anyDark.onSurface,
+            text = R.string.dark,
             isSelected = theme == CuteTheme.DARK,
-            iconAndTint = Pair(
-                R.drawable.dark_mode,
-                anyDarkColorScheme().onBackground
-            )
+            icon = R.drawable.dark_mode
         ),
         ThemeItem(
             onClick = { theme = CuteTheme.LIGHT },
-            backgroundColor = anyLightColorScheme().background,
-            text = stringResource(R.string.light),
-            isSelected = theme == CuteTheme.LIGHT,
-            iconAndTint = Pair(
-                R.drawable.light_mode,
-                anyLightColorScheme().onBackground
-            )
+            backgroundColor = anyLight.surface,
+            iconColor = anyLight.onSurface,
+            text = R.string.light,
+            icon = R.drawable.light_mode,
+            isSelected = theme == CuteTheme.LIGHT
         ),
         ThemeItem(
             onClick = { theme = CuteTheme.AMOLED },
             backgroundColor = Color.Black,
-            text = stringResource(R.string.amoled),
-            isSelected = theme == CuteTheme.AMOLED,
-            iconAndTint = Pair(R.drawable.amoled, Color.White)
+            iconColor = Color.White,
+            text = R.string.amoled,
+            icon = R.drawable.amoled,
+            isSelected = theme == CuteTheme.AMOLED
         )
     )
 
     val fontItems = listOf(
         FontItem(
             onClick = { useSystemFont = false },
-            fontStyle = FontStyle.DEFAULT,
-            borderColor = if (!useSystemFont) MaterialTheme.colorScheme.primary else Color.Transparent,
-            text = {
-                Text(
-                    text = "Tt",
-                    fontFamily = nunitoFontFamily
-                )
-            },
+            isSelected = !useSystemFont,
+            icon = R.drawable.match_case,
+            text = R.string.default_text
         ),
         FontItem(
             onClick = { useSystemFont = true },
-            fontStyle = FontStyle.SYSTEM,
-            borderColor = if (useSystemFont) MaterialTheme.colorScheme.primary else Color.Transparent,
-            text = {
-                Text(
-                    text = "Tt",
-                    style = TextStyle.Default
-                )
-            }
+            isSelected = useSystemFont,
+            icon = R.drawable.system_font,
+            text = R.string.system
         )
     )
 
@@ -130,7 +116,14 @@ fun SettingsLookAndFeel() {
                 LazyRowWithScrollButton(
                     items = themeItems
                 ) { theme ->
-                    ThemeSelector(theme)
+                    SettingsSelector(
+                        onClick = theme.onClick,
+                        icon = theme.icon,
+                        text = theme.text,
+                        isSelected = theme.isSelected,
+                        containerColor = theme.backgroundColor,
+                        contentColor = theme.iconColor
+                    )
                 }
             }
         }
@@ -170,7 +163,12 @@ fun SettingsLookAndFeel() {
                 LazyRowWithScrollButton(
                     items = fontItems
                 ) { font ->
-                    FontSelector(font)
+                    SettingsSelector(
+                        onClick = font.onClick,
+                        icon = font.icon,
+                        text = font.text,
+                        isSelected = font.isSelected
+                    )
                 }
             }
         }
@@ -181,16 +179,17 @@ fun SettingsLookAndFeel() {
 data class ThemeItem(
     val onClick: () -> Unit,
     val backgroundColor: Color,
-    val text: String,
-    val isSelected: Boolean,
-    val iconAndTint: Pair<Int, Color>
+    val iconColor: Color = Color.White,
+    val text: Int,
+    val icon: Int,
+    val isSelected: Boolean
 )
 
 data class FontItem(
     val onClick: () -> Unit,
-    val fontStyle: FontStyle,
-    val borderColor: Color,
-    val text: @Composable () -> Unit
+    val icon: Int,
+    val text: Int,
+    val isSelected: Boolean
 )
 
 enum class FontStyle {
