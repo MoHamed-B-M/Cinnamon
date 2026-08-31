@@ -168,8 +168,6 @@ fun SharedTransitionScope.StartConversation(
 
 
                 item(LazyListKeys.SEND_TO) {
-
-
                     val input = textFieldState.text.toString().beautifyNumber()
 
                     AnimatedVisibility(
