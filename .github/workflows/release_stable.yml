@@ -68,6 +68,6 @@
           with:
             tag_name: ${{ env.TAG }}
             name: ${{ env.TAG }}
-            files: app/build/outputs/apk/release/app-release.apk
+            files: app/build/outputs/apk/release/Cinnamon_${{ env.VERSION }}.apk
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
