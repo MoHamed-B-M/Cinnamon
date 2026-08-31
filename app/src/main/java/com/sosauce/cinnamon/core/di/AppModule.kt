@@ -6,6 +6,7 @@ import android.telephony.TelephonyManager
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.sosauce.cinnamon.core.MediaManager
+import com.sosauce.cinnamon.core.NumberLookup
 import com.sosauce.cinnamon.core.datastore.UserPreferences
 import com.sosauce.cinnamon.core.repository.SimsRepository
 import com.sosauce.cinnamon.features.contacts.data.local.contactSettings.ContactSettingsDao
@@ -16,7 +17,7 @@ import com.sosauce.cinnamon.features.messaging.data.local.scheduledMessages.Sche
 import com.sosauce.cinnamon.features.messaging.data.local.scheduledMessages.ScheduledMessagesDatabase
 import com.sosauce.cinnamon.features.contacts.data.repository.ContactsRepository
 import com.sosauce.cinnamon.features.messaging.data.repository.MessagesRepository
-import com.sosauce.cinnamon.features.phone.data.repository.DialerRepository
+import com.sosauce.cinnamon.features.phone.data.repository.CallLogsRepository
 import com.sosauce.cinnamon.features.messaging.data.repository.ConversationsRepository
 import com.sosauce.cinnamon.features.phone.data.repository.VoicemailsRepository
 import com.sosauce.cinnamon.core.telephony.PhoneNumberNormalizer
@@ -93,6 +94,7 @@ val appModule = module {
     }
 
     singleOf(::UserPreferences)
+    singleOf(::NumberLookup)
     singleOf(::ScheduledMessageManager)
     singleOf(::CallManager)
     singleOf(::MessageNotificationManager)
@@ -101,7 +103,7 @@ val appModule = module {
     singleOf(::MessagesRepository)
     singleOf(::ContactsRepository)
     singleOf(::ConversationsRepository)
-    singleOf(::DialerRepository)
+    singleOf(::CallLogsRepository)
     singleOf(::VoicemailsRepository)
     singleOf(::SimsRepository)
     singleOf(::MediaManager)

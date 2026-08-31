@@ -159,6 +159,7 @@ fun Nav(
 
                         VoicemailScreen(
                             state = state,
+                            textFieldState = viewModel.textFieldState,
                             onNavigateUp = backStack::navigateBack,
                             onNavigate = backStack::add,
                             onDeleteVoicemails = viewModel::deleteVoicemails

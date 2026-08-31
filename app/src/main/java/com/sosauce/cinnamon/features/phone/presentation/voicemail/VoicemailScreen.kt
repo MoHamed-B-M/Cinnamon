@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ContainedLoadingIndicator
@@ -39,12 +40,14 @@ import com.sosauce.cinnamon.core.ui.components.SelectedBarSurface
 import com.sosauce.cinnamon.core.ui.components.buttons.CuteNavigationButton
 import com.sosauce.cinnamon.core.ui.components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.core.utils.selfAlignHorizontally
+import com.sosauce.nekobites.components.LoadingBox
 import com.sosauce.nekobites.components.NoXFound
 import com.sosauce.sweetselect.rememberSweetSelectState
 
 @Composable
 fun VoicemailScreen(
     state: VoicemailState,
+    textFieldState: TextFieldState,
     onNavigateUp: () -> Unit,
     onNavigate: (Screen) -> Unit,
     onDeleteVoicemails: (List<Long>) -> Unit
@@ -82,61 +85,55 @@ fun VoicemailScreen(
             exoPlayer.release()
         }
     }
-
-    if (state.isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            ContainedLoadingIndicator()
-        }
-    } else {
-
-        Scaffold(
-            contentWindowInsets = WindowInsets.safeDrawing,
-            bottomBar = {
-                AnimatedContent(
-                    targetState = sweetSelectState.isInSelectionMode,
-                ) {
-                    if (it) {
-                        SelectedBarSurface(
-                            modifier = Modifier.selfAlignHorizontally(),
-                            items = state.voicemails,
-                            multiSelectState = sweetSelectState
-                        ) {
-                            Button(
-                                onClick = {
-                                    val ids = sweetSelectState.selectedItems.map { it.id }
-                                    onDeleteVoicemails(ids)
-                                    sweetSelectState.clearSelected()
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                                ),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.delete),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        }
-                    } else {
-                        CuteSearchbar(
-                            modifier = Modifier.selfAlignHorizontally(),
-                            textFieldState = state.textFieldState,
-                            navigationIcon = {
-                                CuteNavigationButton(
-                                    onNavigateUp = onNavigateUp
-                                )
+    Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
+        bottomBar = {
+            AnimatedContent(
+                targetState = sweetSelectState.isInSelectionMode,
+            ) {
+                if (it) {
+                    SelectedBarSurface(
+                        modifier = Modifier.selfAlignHorizontally(),
+                        items = state.voicemails,
+                        multiSelectState = sweetSelectState
+                    ) {
+                        Button(
+                            onClick = {
+                                val ids = sweetSelectState.selectedItems.map { it.id }
+                                onDeleteVoicemails(ids)
+                                sweetSelectState.clearSelected()
                             },
-                            onNavigate = onNavigate
-                        )
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.delete),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
+                } else {
+                    CuteSearchbar(
+                        modifier = Modifier.selfAlignHorizontally(),
+                        textFieldState = textFieldState,
+                        navigationIcon = {
+                            CuteNavigationButton(
+                                onNavigateUp = onNavigateUp
+                            )
+                        },
+                        onNavigate = onNavigate
+                    )
                 }
             }
-        ) { paddingValues ->
+        }
+    ) { paddingValues ->
+
+        LoadingBox(
+            isLoading = state.isLoading
+        ) {
             LazyColumn(
                 contentPadding = paddingValues,
                 state = listState
@@ -164,7 +161,7 @@ fun VoicemailScreen(
                                 if (activeVoicemail != voicemail) {
                                     activeVoicemail = voicemail
 
-                                    exoPlayer.setMediaItem(MediaItem.fromUri(voicemail.uri))
+                                    exoPlayer.setMediaItem(MediaItem.fromUri(voicemail.voicemail))
                                     exoPlayer.prepare()
                                     exoPlayer.play()
                                 } else {

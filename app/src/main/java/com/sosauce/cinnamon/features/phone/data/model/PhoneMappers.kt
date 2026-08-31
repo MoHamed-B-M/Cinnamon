@@ -4,11 +4,13 @@ import android.content.Context
 import android.provider.CallLog
 import android.text.format.DateUtils
 import androidx.core.net.toUri
+import coil3.toUri
 import com.sosauce.cinnamon.core.utils.beautifyNumber
 import com.sosauce.cinnamon.core.utils.toTime
 import com.sosauce.cinnamon.features.phone.domain.CallPresentation
 import com.sosauce.cinnamon.features.phone.domain.CallType
 import com.sosauce.cinnamon.features.phone.domain.CuteCallLog2
+import com.sosauce.cinnamon.features.phone.domain.CuteVoicemail
 
 fun CuteCallLogEntity.toDomain(context: Context): CuteCallLog2 {
 
@@ -44,5 +46,22 @@ fun CuteCallLogEntity.toDomain(context: Context): CuteCallLog2 {
         location = location,
         presentation = presentation,
         photo = photo?.toUri()
+    )
+}
+
+fun CuteVoicemailEntity.toDomain(context: Context): CuteVoicemail {
+
+    val formattedDate = DateUtils.formatDateTime(context, date, DateUtils.FORMAT_ABBREV_MONTH)
+    val formattedDuration = DateUtils.formatElapsedTime(duration)
+
+    return CuteVoicemail(
+        id = id,
+        number = number,
+        displayName = name ?: number.beautifyNumber(),
+        date = formattedDate,
+        time = date.toTime(),
+        duration = formattedDuration,
+        photo = photo?.toUri(),
+        voicemail = voicemail.toUri()
     )
 }

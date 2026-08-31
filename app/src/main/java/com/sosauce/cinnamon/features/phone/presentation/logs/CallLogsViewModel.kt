@@ -2,7 +2,6 @@
 
 package com.sosauce.cinnamon.features.phone.presentation.logs
 
-import android.provider.CallLog
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.util.fastFilter
@@ -10,10 +9,8 @@ import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sosauce.cinnamon.core.datastore.UserPreferences
-import com.sosauce.cinnamon.features.phone.data.repository.DialerRepository
-import com.sosauce.cinnamon.core.utils.copyMutate
+import com.sosauce.cinnamon.features.phone.data.repository.CallLogsRepository
 import com.sosauce.cinnamon.core.utils.groupSubsequentlyBy
-import com.sosauce.cinnamon.core.utils.toDate
 import com.sosauce.cinnamon.features.phone.domain.CallType
 import com.sosauce.cinnamon.features.phone.domain.CuteCallLog2
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +29,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 class CallLogsViewModel(
-    private val dialerRepository: DialerRepository,
+    private val callLogsRepository: CallLogsRepository,
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 
@@ -50,7 +47,7 @@ class CallLogsViewModel(
         viewModelScope.launch(Dispatchers.IO) {
 
             combine(
-                dialerRepository.fetchLatestCallLog(),
+                callLogsRepository.fetchLatestCallLog(),
                 state.mapLatest { it.filter }.distinctUntilChanged(),
                 userPreferences.sortLogsAscending,
                 userPreferences.groupSubsequentCalls,
@@ -103,7 +100,7 @@ class CallLogsViewModel(
             is DialerAction.ChangeSort -> {}
             is DialerAction.DeleteLogs -> {
                 viewModelScope.launch(Dispatchers.IO) {
-                    dialerRepository.deleteCallLog(action.ids)
+                    callLogsRepository.deleteCallLog(action.ids)
                 }
             }
         }

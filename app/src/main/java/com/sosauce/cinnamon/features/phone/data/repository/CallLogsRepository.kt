@@ -10,6 +10,7 @@ import android.provider.ContactsContract
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import com.sosauce.cinnamon.R
+import com.sosauce.cinnamon.core.NumberLookup
 import com.sosauce.cinnamon.core.utils.observe
 import com.sosauce.cinnamon.features.phone.data.model.CuteCallLogEntity
 import com.sosauce.cinnamon.features.phone.data.model.toDomain
@@ -22,8 +23,9 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 
 
-class DialerRepository(
-    private val context: Context
+class CallLogsRepository(
+    private val context: Context,
+    private val numberLookup: NumberLookup
 ) {
 
     fun fetchLatestCallLog(): Flow<List<CuteCallLog2>> {
@@ -91,7 +93,15 @@ class DialerRepository(
                         location = location,
                         presentation = presentation,
                         type = callType,
-                        photo = photo?.ifEmpty { getLogPhoto(number) } ?: getLogPhoto(number)
+                        photo = photo?.ifEmpty {
+                            numberLookup.fetchPhoto(
+                                number = number,
+                                fullQuality = false
+                            )
+                        } ?: numberLookup.fetchPhoto(
+                            number = number,
+                            fullQuality = false
+                        )
                     )
                 )
 
@@ -99,32 +109,6 @@ class DialerRepository(
         }
         return logs
     }
-
-
-    private fun getLogPhoto(number: String): String? {
-        val uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number))
-        val projection = arrayOf(
-            ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI
-        )
-
-        context.contentResolver.query(
-            uri,
-            projection,
-            null,
-            null,
-            null
-        )?.use { cursor ->
-
-            val photoColumn = cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI)
-
-            if (cursor.moveToFirst()) {
-                return cursor.getString(photoColumn)
-            }
-        }
-
-        return null
-    }
-
 
     suspend fun deleteCallLog(ids: List<Long>) = withContext(Dispatchers.IO) {
 
