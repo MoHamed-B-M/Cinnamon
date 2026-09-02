@@ -119,6 +119,11 @@ class CallService : InCallService(), CallServiceCallback, AndroidCallCallback, K
         job.cancel()
     }
 
+    override fun onBringToForeground(showDialpad: Boolean) {
+        super.onBringToForeground(showDialpad)
+        launchCallActivity()
+    }
+
     private fun launchCallActivity() {
         val intent = Intent(this, CallActivity::class.java).apply {
             addFlags(
@@ -157,12 +162,14 @@ class CallService : InCallService(), CallServiceCallback, AndroidCallCallback, K
 
 
         val subId = call.details.accountHandle?.id?.toIntOrNull() ?: -1
-        val activeSubInfo = subscriptionManager.getActiveSubscriptionInfo(subId)
+        val activeSubInfo = try {
+            subscriptionManager.getActiveSubscriptionInfo(subId)
+        } catch (_: SecurityException) { null }
         val sim = CuteSimCard(
-            subId = activeSubInfo.subscriptionId,
-            name = activeSubInfo.displayName.toString(),
-            carrierName = activeSubInfo.carrierName.toString(),
-            color = activeSubInfo.iconTint
+            subId = activeSubInfo?.subscriptionId ?: subId,
+            name = activeSubInfo?.displayName?.toString() ?: "SIM $subId",
+            carrierName = activeSubInfo?.carrierName?.toString() ?: "",
+            color = activeSubInfo?.iconTint ?: 0
         )
 
         callManager.updateActiveSim(sim)
@@ -204,6 +211,24 @@ class CallService : InCallService(), CallServiceCallback, AndroidCallCallback, K
 
                 Call.STATE_HOLDING -> {
                     callManager.updateIsHolding(true)
+                    null
+                }
+
+                Call.STATE_SELECT_PHONE_ACCOUNT -> {
+                    // Fallback if Telecom still asks to select SIM — pick first available and proceed
+                    // This prevents system SIM chooser from opening default dialer
+                    try {
+                        @Suppress("MissingPermission")
+                        val tm = getSystemService(android.telecom.TelecomManager::class.java)
+                        val firstHandle = tm.callCapablePhoneAccounts?.firstOrNull() as? android.telecom.PhoneAccountHandle
+                        if (firstHandle != null) {
+                            call.phoneAccountSelected(firstHandle, false)
+                        } else {
+                            callManager.updateCallState(CallState.ENDED)
+                        }
+                    } catch (_: Exception) {
+                        callManager.updateCallState(CallState.ENDED)
+                    }
                     null
                 }
 
@@ -274,7 +299,21 @@ class CallService : InCallService(), CallServiceCallback, AndroidCallCallback, K
     }
 
     override fun hangupOngoingCall() {
-        cuteCall?.disconnect()
+        // Try primary call first, then any call in InCallService's call list
+        // Fixes "end call button not working" when cuteCall is null (optimistic UI)
+        // or when Telecom hasn't yet delivered the call to cuteCall.
+        val target = cuteCall ?: try { calls.firstOrNull() } catch (_: Exception) { null }
+        if (target != null) {
+            try { target.disconnect() } catch (_: Exception) {}
+        } else {
+            // No Telecom call to disconnect — force UI to ENDED so CallActivity finishes
+            callManager.updateCallState(CallState.ENDED)
+        }
+        // Always ensure state moves to ENDED for immediate UI feedback
+        // (CallService will also get STATE_DISCONNECTED callback)
+        try {
+            if (cuteCall == null) callManager.updateCallState(CallState.ENDED)
+        } catch (_: Exception) {}
     }
 
     override fun startTone(char: Char) {
