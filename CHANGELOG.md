@@ -1,5 +1,12 @@
 # Changelog
 
+<p align="center">
+  <img src="app/src/screenshots/Screenshot_2026-09-02-22-39-00-65_8c02876c916b2499e7b70b58cc95ac58.jpg" width="180" alt="Cinnamon Homescreen" />
+  <img src="app/src/screenshots/Screenshot_2026-09-02-22-39-04-82_8c02876c916b2499e7b70b58cc95ac58.jpg" width="180" alt="Cinnamon Conversations" />
+  <img src="app/src/screenshots/Screenshot_2026-09-02-22-39-19-29_8c02876c916b2499e7b70b58cc95ac58~2.jpg" width="180" alt="Cinnamon Dialer" />
+  <img src="app/src/screenshots/Screenshot_2026-09-02-22-39-35-78_8c02876c916b2499e7b70b58cc95ac58~2.jpg" width="180" alt="Cinnamon Call Screen" />
+</p>
+
 ## [1.0.5] - 2026-09-02
 
 ### Features
