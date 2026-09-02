@@ -11,7 +11,6 @@ import com.sosauce.cinnamon.features.contacts.data.local.contactSettings.Contact
 import com.sosauce.cinnamon.core.telephony.phone.CallManager
 import com.sosauce.cinnamon.features.phone.domain.AudioRoute
 import com.sosauce.cinnamon.features.phone.domain.CuteSimCard
-import com.sosauce.cinnamon.core.utils.createDefaultDialerIntent
 import com.sosauce.cinnamon.core.utils.getContactId
 import com.sosauce.cinnamon.features.phone.presentation.call.CallActivity
 import kotlinx.coroutines.Dispatchers
@@ -49,46 +48,29 @@ class CallingViewModel(
         when (action) {
             is CallAction.LaunchCall -> {
                 if (callManager.isInCall()) return
-                val telecomManager = application.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-                val isDefaultDialer = telecomManager.defaultDialerPackage == application.packageName
-                if (!isDefaultDialer) {
-                    // Not default dialer — Telecom would route to system UI.
-                    // Show system dialer as fallback and prompt to set Cinnamon as default for next time.
-                    try {
-                        val dialIntent = Intent(Intent.ACTION_DIAL).apply {
-                            data = "tel:${action.number}".toUri()
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        }
-                        application.startActivity(dialIntent)
-                    } catch (_: Exception) {}
-                    try {
-                        val roleIntent = application.createDefaultDialerIntent().apply {
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        }
-                        if (roleIntent.action?.isNotEmpty() == true) {
-                            application.startActivity(roleIntent)
-                        }
-                    } catch (_: Exception) {}
-                    return
+                // Always open Cinnamon's call UI — no default-dialer gating.
+                // Telecom will still place the call via CallManager; we show our
+                // expressive CallScreen immediately for instant feedback.
+                val success = try {
+                    callManager.startCall(action.number)
+                } catch (_: Exception) { false }
+                // Optimistically update state and launch UI even if placeCall
+                // threw — ensures call button always opens Cinnamon's CallScreen
+                // (incoming UI is handled separately via CallService fullScreenIntent).
+                callManager._callingState.update {
+                    it.copy(
+                        number = action.number,
+                        displayName = action.number,
+                        callState = CallState.DIALING
+                    )
                 }
-                val success = callManager.startCall(action.number)
-                if (success) {
-                    // Optimistic UI — show Cinnamon's expressive CallScreen immediately
-                    // before Telecom's async InCallService callback arrives.
-                    callManager._callingState.update {
-                        it.copy(
-                            number = action.number,
-                            displayName = action.number, // will be beautified/contact-resolved in CallManager.updateNumber
-                            callState = CallState.DIALING
-                        )
+                try {
+                    val intent = Intent(application, CallActivity::class.java).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     }
-                    try {
-                        val intent = Intent(application, CallActivity::class.java).apply {
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        }
-                        application.startActivity(intent)
-                    } catch (_: Exception) {}
-                }
+                    application.startActivity(intent)
+                } catch (_: Exception) {}
+                // `success` is kept for future retry logic if needed, but UI always opens.
             }
 
             is CallAction.AnswerCall -> callManager.answerCall()
