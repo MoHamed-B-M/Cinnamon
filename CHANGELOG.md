@@ -31,3 +31,10 @@ All updates to Cinnamon — simple and clear.
 
 ## [1.0.3] - August 22, 2026
 - Call logs and settings navigation tweaks.
+
+---
+
+### 👥 Contributors
+- **MoHamed-B-M** — [@MoHamed-B-M](https://github.com/MoHamed-B-M)
+
+*Crafted with ❤️ by [MoHamed-B-M](https://github.com/MoHamed-B-M) — Lead Developer & Maintainer*
