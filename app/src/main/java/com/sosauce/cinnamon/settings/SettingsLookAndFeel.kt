@@ -19,9 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.core.datastore.rememberAppTheme
-import com.sosauce.cinnamon.core.datastore.rememberExpressiveBlurEnabled
 import com.sosauce.cinnamon.core.datastore.rememberIncomingCallFullscreen
-import com.sosauce.cinnamon.core.datastore.rememberMotionBlurEnabled
 import com.sosauce.cinnamon.core.datastore.rememberPaletteStyle
 import com.sosauce.cinnamon.core.datastore.rememberUseSystemFont
 import com.sosauce.cinnamon.core.ui.nunitoFontFamily
@@ -106,8 +104,6 @@ fun SettingsLookAndFeel() {
         CutePaletteStyle.FRUIT_SALAD
     )
 
-    var expressiveBlur by rememberExpressiveBlurEnabled()
-    var motionBlur by rememberMotionBlurEnabled()
     var incomingFullscreen by rememberIncomingCallFullscreen()
 
     Column {
@@ -181,36 +177,14 @@ fun SettingsLookAndFeel() {
             }
         }
 
-        // M3 Expressive blur — entire app + nav bar + motion + incoming popup (moved from Permissions)
+        // Incoming call popup — moved from Permissions (blur options removed per request)
         SettingsWithTitle(
             title = R.string.look_and_feel
         ) {
             SwitchSettingsCard(
-                checked = expressiveBlur,
-                onCheckedChange = { expressiveBlur = !expressiveBlur },
-                topDp = 24.dp,
-                bottomDp = 4.dp,
-                text = "Expressive blur (entire app)",
-                optionalDescription = R.string.look_and_feel_desc
-            )
-            SwitchSettingsCard(
-                checked = expressiveBlur,
-                onCheckedChange = { expressiveBlur = !expressiveBlur },
-                topDp = 4.dp,
-                bottomDp = 4.dp,
-                text = "Blur under navigation bar"
-            )
-            SwitchSettingsCard(
-                checked = motionBlur,
-                onCheckedChange = { motionBlur = !motionBlur },
-                topDp = 4.dp,
-                bottomDp = 4.dp,
-                text = "Motion blur (animations)"
-            )
-            SwitchSettingsCard(
                 checked = incomingFullscreen,
                 onCheckedChange = { incomingFullscreen = !incomingFullscreen },
-                topDp = 4.dp,
+                topDp = 24.dp,
                 bottomDp = 24.dp,
                 text = "Incoming call full-screen popup"
             )

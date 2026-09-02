@@ -4,16 +4,12 @@ package com.sosauce.cinnamon.features.messaging.presentation.conversation
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
@@ -28,11 +24,7 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxState
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -45,21 +37,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.core.datastore.rememberSortConversationsAscending
-import com.sosauce.cinnamon.core.datastore.rememberSwipeToDeleteEnabled
 import com.sosauce.cinnamon.features.messaging.domain.CuteConversation
 import com.sosauce.cinnamon.features.messaging.presentation.conversation.components.Conversation
 import com.sosauce.cinnamon.app.navigation.Screen
 import com.sosauce.cinnamon.core.ui.components.ConversationsSelectedBar
 import com.sosauce.cinnamon.core.ui.components.searchbars.CuteSearchbar
 import com.sosauce.cinnamon.core.utils.LazyListKeys
-import com.sosauce.cinnamon.core.utils.LocalHazeState
 import com.sosauce.cinnamon.core.utils.selfAlignHorizontally
 import com.sosauce.cinnamon.features.messaging.presentation.conversation.components.PinnedConversation
 import com.sosauce.nekobites.animations.AnimatedFab
 import com.sosauce.nekobites.components.NoXFound
 import com.sosauce.sweetselect.SweetSelectState
 import com.sosauce.sweetselect.rememberSweetSelectState
-import dev.chrisbanes.haze.hazeSource
 
 @Composable
 fun SharedTransitionScope.ConversationsScreen(
@@ -71,8 +60,6 @@ fun SharedTransitionScope.ConversationsScreen(
     val listState = rememberLazyListState()
     val sweetSelectState = rememberSweetSelectState<CuteConversation>()
     var sortConversationsAscending by rememberSortConversationsAscending()
-    val hazeState = LocalHazeState.current
-    val swipeToDeleteEnabled by rememberSwipeToDeleteEnabled()
 
     if (state.isLoading) {
         Box(
@@ -139,8 +126,7 @@ fun SharedTransitionScope.ConversationsScreen(
         ) { paddingValues ->
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .hazeSource(state = hazeState),
+                    .fillMaxSize(),
                 contentPadding = paddingValues,
                 state = listState
             ) {
@@ -171,7 +157,6 @@ fun SharedTransitionScope.ConversationsScreen(
                     onNavigate = onNavigate,
                     sharedTransitionScope = this@ConversationsScreen,
                     onHandleConversationsAction = onHandleConversationsAction,
-                    swipeToDeleteEnabled = swipeToDeleteEnabled && !sweetSelectState.isInSelectionMode,
                     emptyState = {
                         NoXFound(
                             headlineText = R.string.no_convo_found,
@@ -192,8 +177,7 @@ fun LazyListScope.threadsList(
     onNavigate: (Screen) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     emptyState: @Composable () -> Unit,
-    onHandleConversationsAction: (ConversationsAction) -> Unit,
-    swipeToDeleteEnabled: Boolean = true
+    onHandleConversationsAction: (ConversationsAction) -> Unit
 ) {
     item(LazyListKeys.PINNED_CONVERSATIONS) {
         LazyRow(modifier = Modifier.fillMaxWidth()) {
@@ -231,70 +215,19 @@ fun LazyListScope.threadsList(
 
             val isSelected by sweetSelectState.isSelectedAsState(conversation)
 
-            if (swipeToDeleteEnabled) {
-                val dismissState = rememberSwipeToDismissBoxState(
-                    confirmValueChange = { target ->
-                        if (target == SwipeToDismissBoxValue.EndToStart) {
-                            onHandleConversationsAction(
-                                ConversationsAction.DeleteConversations(listOf(conversation.threadId))
-                            )
-                            true
-                        } else false
+            Conversation(
+                conversation = conversation,
+                modifier = Modifier.animateItem(),
+                onClick = {
+                    if (sweetSelectState.isInSelectionMode) {
+                        sweetSelectState.toggle(conversation)
+                    } else {
+                        onNavigate(Screen.ConversationDetails(conversation.threadId))
                     }
-                )
-                SwipeToDismissBox(
-                    state = dismissState,
-                    backgroundContent = {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp, vertical = 4.dp)
-                                .background(
-                                    color = MaterialTheme.colorScheme.errorContainer,
-                                    shape = RoundedCornerShape(16.dp)
-                                )
-                                .padding(16.dp),
-                            contentAlignment = Alignment.CenterEnd
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.delete),
-                                contentDescription = "Delete",
-                                tint = MaterialTheme.colorScheme.onErrorContainer,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    },
-                    content = {
-                        Conversation(
-                            conversation = conversation,
-                            modifier = Modifier.animateItem(),
-                            onClick = {
-                                if (sweetSelectState.isInSelectionMode) {
-                                    sweetSelectState.toggle(conversation)
-                                } else {
-                                    onNavigate(Screen.ConversationDetails(conversation.threadId))
-                                }
-                            },
-                            onLongClick = { sweetSelectState.toggle(conversation) },
-                            isSelected = isSelected
-                        )
-                    }
-                )
-            } else {
-                Conversation(
-                    conversation = conversation,
-                    modifier = Modifier.animateItem(),
-                    onClick = {
-                        if (sweetSelectState.isInSelectionMode) {
-                            sweetSelectState.toggle(conversation)
-                        } else {
-                            onNavigate(Screen.ConversationDetails(conversation.threadId))
-                        }
-                    },
-                    onLongClick = { sweetSelectState.toggle(conversation) },
-                    isSelected = isSelected
-                )
-            }
+                },
+                onLongClick = { sweetSelectState.toggle(conversation) },
+                isSelected = isSelected
+            )
         }
     }
     if (conversations.isEmpty() && pinnedConversations.isEmpty()) {

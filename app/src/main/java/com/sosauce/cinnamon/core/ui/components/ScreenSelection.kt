@@ -20,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.app.navigation.Screen
-import com.sosauce.cinnamon.core.datastore.rememberExpressiveBlurEnabled
 import com.sosauce.cinnamon.core.utils.LocalScreen
 
 @Composable
@@ -53,11 +52,7 @@ fun SharedTransitionScope.ScreenSelection(
             selectedIcon = R.drawable.phone_filled
         )
     )
-    val expressiveBlurEnabled by rememberExpressiveBlurEnabled()
-    ShortNavigationBar(
-        containerColor = if (expressiveBlurEnabled) MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.82f) else MaterialTheme.colorScheme.surfaceContainer,
-        contentColor = MaterialTheme.colorScheme.onSurface
-    ) {
+    ShortNavigationBar {
             screens.forEach { screen ->
 
                 val haptic = LocalHapticFeedback.current

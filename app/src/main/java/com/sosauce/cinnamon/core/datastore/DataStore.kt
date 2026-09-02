@@ -47,9 +47,6 @@ data object PreferencesKeys {
     val ENABLE_T9_DIALING = booleanPreferencesKey("ENABLE_T9_DIALING")
     val SORT_LOGS_ASCENDING = booleanPreferencesKey("SORT_LOGS_ASCENDING")
     val INCOMING_CALL_FULLSCREEN = booleanPreferencesKey("INCOMING_CALL_FULLSCREEN")
-    val ENABLE_EXPRESSIVE_BLUR = booleanPreferencesKey("ENABLE_EXPRESSIVE_BLUR")
-    val ENABLE_MOTION_BLUR = booleanPreferencesKey("ENABLE_MOTION_BLUR")
-    val ENABLE_SWIPE_TO_DELETE = booleanPreferencesKey("ENABLE_SWIPE_TO_DELETE")
 }
 
 
@@ -111,15 +108,6 @@ fun rememberSortLogsAscending() = rememberPreference(PreferencesKeys.SORT_LOGS_A
 
 @Composable
 fun rememberIncomingCallFullscreen() = rememberPreference(PreferencesKeys.INCOMING_CALL_FULLSCREEN, true)
-
-@Composable
-fun rememberExpressiveBlurEnabled() = rememberPreference(PreferencesKeys.ENABLE_EXPRESSIVE_BLUR, true)
-
-@Composable
-fun rememberMotionBlurEnabled() = rememberPreference(PreferencesKeys.ENABLE_MOTION_BLUR, true)
-
-@Composable
-fun rememberSwipeToDeleteEnabled() = rememberPreference(PreferencesKeys.ENABLE_SWIPE_TO_DELETE, true)
 
 @Composable
 fun rememberInitialScreen() = rememberPreference(PreferencesKeys.DEFAULT_TAB, DefaultTabOption.MESSAGES)
