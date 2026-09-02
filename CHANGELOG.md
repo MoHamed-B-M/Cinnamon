@@ -27,6 +27,7 @@
 - fix(settings): remove swipe to delete toggle and fix unresolved reference by @MoHamed-B-M in dc3fecf
 - fix(messages): make swipe to delete setting scrollable and add missing size import by @MoHamed-B-M in d51f981
 - fix(messages): remove swipe to delete per request by @MoHamed-B-M in dc3fecf
+- fix(messages): fix crash when opening conversation with empty participants by @MoHamed-B-M in 08045ed
 
 ### Chores
 - chore(release): add ephemeral beta preview and stable release workflows with keystore signing by @MoHamed-B-M in 004a961
