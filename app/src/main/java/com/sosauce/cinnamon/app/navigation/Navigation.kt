@@ -54,6 +54,7 @@ import com.sosauce.cinnamon.core.utils.LocalScreen
 import com.sosauce.cinnamon.core.utils.navigateBack
 import com.sosauce.cinnamon.core.utils.rememberHazeState
 import com.sosauce.cinnamon.core.utils.tabToScreen
+import dev.chrisbanes.haze.hazeSource
 import com.sosauce.cinnamon.features.messaging.presentation.conversation.ConversationActions
 import com.sosauce.cinnamon.features.messaging.presentation.conversation.ConversationDetailsEvents
 import com.sosauce.cinnamon.features.messaging.presentation.conversation.ConversationDetailsScreen
@@ -87,7 +88,9 @@ fun Nav(
         SharedTransitionLayout {
             NavDisplay(
                 backStack = backStack,
-                modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .hazeSource(state = hazeState),
                 entryDecorators = listOf(
                     rememberSaveableStateHolderNavEntryDecorator(),
                     rememberViewModelStoreNavEntryDecorator()

@@ -65,11 +65,15 @@ import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.app.providers.PhotoQuality
 import com.sosauce.cinnamon.core.ui.CinnamonTheme
 import com.sosauce.cinnamon.core.ui.components.DefaultContactIcon
+import com.sosauce.cinnamon.core.utils.LocalHazeState
+import com.sosauce.cinnamon.core.utils.cuteHazeEffect
+import com.sosauce.cinnamon.core.utils.rememberHazeState
 import com.sosauce.cinnamon.core.utils.toStopwatch
 import com.sosauce.cinnamon.features.phone.domain.AudioRoute
 import com.sosauce.cinnamon.features.phone.presentation.call.components.CallBottomBar
 import com.sosauce.cinnamon.features.phone.presentation.call.components.IncomingBottomBar
 import com.sosauce.nekobites.animations.bouncySpec
+import dev.chrisbanes.haze.hazeSource
 import kotlin.time.DurationUnit
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -103,32 +107,45 @@ fun CallScreen(
     )
     val pulseAlpha1 = if (isRinging || isDialing) 0.18f else 0f
     val pulseAlpha2 = if (isRinging || isDialing) 0.09f else 0f
+    val hazeState = rememberHazeState()
 
-    Scaffold(
-        containerColor = Color.Transparent,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        bottomBar = {
-            AnimatedContent(
-                targetState = isRinging,
-                transitionSpec = { scaleIn(bouncySpec()) + fadeIn() togetherWith scaleOut(bouncySpec()) + fadeOut() },
-                label = "bottomBarSwitch"
-            ) { ringing ->
-                if (ringing) {
-                    IncomingBottomBar(onCallAction = onCallAction)
-                } else {
-                    CallBottomBar(
-                        onCallAction = onCallAction,
-                        callUiState = callUiState
-                    )
+    androidx.compose.runtime.CompositionLocalProvider(LocalHazeState provides hazeState) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            bottomBar = {
+                // M3 Expressive blur — bottom bar hazed over poster behind
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .cuteHazeEffect(
+                            state = hazeState,
+                            backgroundColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.82f)
+                        )
+                ) {
+                    AnimatedContent(
+                        targetState = isRinging,
+                        transitionSpec = { scaleIn(bouncySpec()) + fadeIn() togetherWith scaleOut(bouncySpec()) + fadeOut() },
+                        label = "bottomBarSwitch"
+                    ) { ringing ->
+                        if (ringing) {
+                            IncomingBottomBar(onCallAction = onCallAction)
+                        } else {
+                            CallBottomBar(
+                                onCallAction = onCallAction,
+                                callUiState = callUiState
+                            )
+                        }
+                    }
                 }
             }
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
-        ) {
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface)
+                    .hazeSource(state = hazeState)
+            ) {
             // Poster / backdrop with expressive scrim + tonal gradient
             AsyncImage(
                 model = callUiState.poster.toUri(),
@@ -438,7 +455,7 @@ fun CallScreen(
             }
         }
     }
-}
+    }
 
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES

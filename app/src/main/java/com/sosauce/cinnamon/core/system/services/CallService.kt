@@ -41,6 +41,7 @@ class CallService : InCallService(), CallServiceCallback, AndroidCallCallback, K
     private lateinit var audioManager: AudioManager
     val callNotificationManager by inject<CallNotificationManager>()
     val callManager by inject<CallManager>()
+    val callOverlayManager by inject<CallOverlayManager>()
     private var cuteCall: Call? = null
 
     private val handler = Handler(Looper.getMainLooper())
@@ -111,11 +112,17 @@ class CallService : InCallService(), CallServiceCallback, AndroidCallCallback, K
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager).apply {
             requestAudioFocus(audioFocus)
         }
+        // Start observing call state to show/hide bubble overlay over other apps
+        // M3 Expressive blur background via tonal surface in CallBubble
+        try {
+            callOverlayManager.observe(scope)
+        } catch (_: Exception) {}
     }
 
     override fun onDestroy() {
         super.onDestroy()
         audioManager.abandonAudioFocusRequest(audioFocus)
+        try { callOverlayManager.hideOverlay() } catch (_: Exception) {}
         job.cancel()
     }
 

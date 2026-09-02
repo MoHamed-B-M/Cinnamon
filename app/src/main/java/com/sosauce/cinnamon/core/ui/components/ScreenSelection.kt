@@ -3,13 +3,18 @@
 package com.sosauce.cinnamon.core.ui.components
 
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShortNavigationBar
 import androidx.compose.material3.ShortNavigationBarItem
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
@@ -17,7 +22,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.app.navigation.Screen
+import com.sosauce.cinnamon.core.utils.LocalHazeState
 import com.sosauce.cinnamon.core.utils.LocalScreen
+import com.sosauce.cinnamon.core.utils.cuteHazeEffect
 
 @Composable
 fun SharedTransitionScope.ScreenSelection(
@@ -49,38 +56,55 @@ fun SharedTransitionScope.ScreenSelection(
             selectedIcon = R.drawable.phone_filled
         )
     )
-    ShortNavigationBar {
-        screens.forEach { screen ->
+    // M3 Expressive blur — haze over content behind nav bar, tonal translucent surface
+    val hazeState = LocalHazeState.current
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .cuteHazeEffect(
+                state = hazeState,
+                backgroundColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.78f)
+            ),
+        color = Color.Transparent,
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp
+    ) {
+        ShortNavigationBar(
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ) {
+            screens.forEach { screen ->
 
-            val haptic = LocalHapticFeedback.current
-            val selected = currentScreen == screen.screen
+                val haptic = LocalHapticFeedback.current
+                val selected = currentScreen == screen.screen
 
 
-            ShortNavigationBarItem(
-                selected = selected,
-                onClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
-                    dismiss()
-                    screen.onClick()
-                },
-                icon = {
-                    val icon = if (selected) screen.selectedIcon else screen.unselectedIcon
-                    Icon(
-                        painter = painterResource(icon),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .sharedElement(
-                                sharedContentState = rememberSharedContentState(icon),
-                                animatedVisibilityScope = LocalNavAnimatedContentScope.current
-                            )
-                    )
-                },
-                label = {
-                    Text(
-                        text = stringResource(screen.name)
-                    )
-                }
-            )
+                ShortNavigationBarItem(
+                    selected = selected,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                        dismiss()
+                        screen.onClick()
+                    },
+                    icon = {
+                        val icon = if (selected) screen.selectedIcon else screen.unselectedIcon
+                        Icon(
+                            painter = painterResource(icon),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .sharedElement(
+                                    sharedContentState = rememberSharedContentState(icon),
+                                    animatedVisibilityScope = LocalNavAnimatedContentScope.current
+                                )
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(screen.name)
+                        )
+                    }
+                )
+            }
         }
     }
 }
