@@ -181,13 +181,13 @@ fun SettingsLookAndFeel() {
             }
         }
 
-        // M3 Expressive blur — entire app + nav bar + motion
+        // M3 Expressive blur — entire app + nav bar + motion + incoming popup (moved from Permissions)
         SettingsWithTitle(
             title = R.string.look_and_feel
         ) {
             SwitchSettingsCard(
                 checked = expressiveBlur,
-                onCheckedChange = { expressiveBlur = it },
+                onCheckedChange = { expressiveBlur = !expressiveBlur },
                 topDp = 24.dp,
                 bottomDp = 4.dp,
                 text = "Expressive blur (entire app)",
@@ -195,21 +195,21 @@ fun SettingsLookAndFeel() {
             )
             SwitchSettingsCard(
                 checked = expressiveBlur,
-                onCheckedChange = { expressiveBlur = it },
+                onCheckedChange = { expressiveBlur = !expressiveBlur },
                 topDp = 4.dp,
                 bottomDp = 4.dp,
                 text = "Blur under navigation bar"
             )
             SwitchSettingsCard(
                 checked = motionBlur,
-                onCheckedChange = { motionBlur = it },
+                onCheckedChange = { motionBlur = !motionBlur },
                 topDp = 4.dp,
                 bottomDp = 4.dp,
                 text = "Motion blur (animations)"
             )
             SwitchSettingsCard(
                 checked = incomingFullscreen,
-                onCheckedChange = { incomingFullscreen = it },
+                onCheckedChange = { incomingFullscreen = !incomingFullscreen },
                 topDp = 4.dp,
                 bottomDp = 24.dp,
                 text = "Incoming call full-screen popup"
