@@ -16,6 +16,7 @@ import android.telecom.InCallService
 import android.telecom.VideoProfile
 import android.telephony.SubscriptionManager
 import com.sosauce.cinnamon.R
+import com.sosauce.cinnamon.core.datastore.dataStore
 import com.sosauce.cinnamon.features.phone.presentation.call.CallActivity
 import com.sosauce.cinnamon.core.telephony.phone.AndroidCallCallback
 import com.sosauce.cinnamon.core.telephony.phone.CallManager
@@ -28,7 +29,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.uuid.ExperimentalUuidApi
@@ -183,6 +186,13 @@ class CallService : InCallService(), CallServiceCallback, AndroidCallCallback, K
 
 
         scope.launch {
+            // Check incoming call popup setting — if disabled, show bubble/notification only, not full-screen
+            val useFullScreen = try {
+                runBlocking {
+                    applicationContext.dataStore.data.first()[com.sosauce.cinnamon.core.datastore.PreferencesKeys.INCOMING_CALL_FULLSCREEN] ?: true
+                }
+            } catch (_: Exception) { true }
+
             val notification = when (state) {
                 Call.STATE_RINGING -> {
                     callManager.updateCallState(CallState.RINGING)
@@ -190,10 +200,12 @@ class CallService : InCallService(), CallServiceCallback, AndroidCallCallback, K
                         call.details?.handle?.schemeSpecificPart ?: getString(R.string.unknown)
                     )
                     // For incoming, ensure foreground before fullScreenIntent
-                    val notif = callNotificationManager.createIncomingNotification(call.details)
-                    // Also try to launch UI directly for devices that allow it
-                    // (relies on fullScreenIntent as primary)
-                    try { launchCallActivity() } catch (_: Exception) {}
+                    val notif = callNotificationManager.createIncomingNotification(call.details, useFullScreen)
+                    // Only launch full-screen CallActivity if setting enabled
+                    // Otherwise, bubble overlay (CallOverlayManager) will show as popup over other apps
+                    if (useFullScreen) {
+                        try { launchCallActivity() } catch (_: Exception) {}
+                    }
                     notif
                 }
 

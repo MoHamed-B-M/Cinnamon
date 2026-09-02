@@ -71,7 +71,8 @@ class CallNotificationManager(
 
     @SuppressLint("MissingPermission")
     suspend fun createIncomingNotification(
-        callDetails: Call.Details
+        callDetails: Call.Details,
+        useFullScreen: Boolean = true
     ): Notification {
 
         val number = callDetails.gatewayInfo?.originalAddress?.schemeSpecificPart
@@ -91,7 +92,7 @@ class CallNotificationManager(
             .setCategory(Notification.CATEGORY_CALL)
             .setOngoing(true)
             .setContentIntent(pendingIntent)
-            .setFullScreenIntent(pendingIntent, true)
+            .setFullScreenIntent(pendingIntent, useFullScreen)
             .setStyle(
                 NotificationCompat.CallStyle.forIncomingCall(
                     Person.Builder()

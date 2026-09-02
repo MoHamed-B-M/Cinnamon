@@ -40,9 +40,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
+import com.sosauce.cinnamon.core.datastore.rememberIncomingCallFullscreen
 import com.sosauce.cinnamon.core.utils.createDefaultDialerIntent
 import com.sosauce.cinnamon.core.utils.createDefaultSmsIntent
 import com.sosauce.cinnamon.settings.components.SettingsWithTitle
+import com.sosauce.cinnamon.settings.components.SwitchSettingsCard
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 
@@ -204,17 +206,25 @@ fun SettingsPermissions() {
                 } else {
                     Button(
                         onClick = {
-                            val intent = context.createDefaultDialerIntent().apply {
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            }
-                            if (intent.action?.isNotEmpty() == true) {
-                                dialerLauncher.launch(intent)
+                            // Fix: RoleManager intent must be launched without NEW_TASK for ActivityResultLauncher
+                            val roleIntent = context.createDefaultDialerIntent()
+                            if (roleIntent.action != null && roleIntent.action!!.isNotEmpty()) {
+                                try {
+                                    dialerLauncher.launch(roleIntent)
+                                } catch (_: Exception) {
+                                    // Fallback: try with NEW_TASK via startActivity
+                                    try { context.startActivity(roleIntent.apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }) } catch (_: Exception) {}
+                                }
                             } else {
-                                // Fallback for older devices
+                                // Fallback for older devices / when RoleManager not available
                                 val fallback = Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER).apply {
                                     putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, context.packageName)
                                 }
-                                dialerLauncher.launch(fallback)
+                                try {
+                                    dialerLauncher.launch(fallback)
+                                } catch (_: Exception) {
+                                    try { context.startActivity(fallback.apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }) } catch (_: Exception) {}
+                                }
                             }
                         },
                         shapes = ButtonDefaults.shapes(),
@@ -336,9 +346,89 @@ fun SettingsPermissions() {
                 }
             }
 
+            // Incoming call full-screen popup — M3 Expressive
+            var incomingFullscreen by rememberIncomingCallFullscreen()
+            Spacer(Modifier.height(12.dp))
+            Card(
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 2.dp),
+                shape = RoundedCornerShape(24.dp)
+            ) {
+                Column(modifier = Modifier.padding(4.dp)) {
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = if (incomingFullscreen) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest,
+                                modifier = Modifier.size(40.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.phone_filled),
+                                    contentDescription = null,
+                                    tint = if (incomingFullscreen) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .size(24.dp)
+                                )
+                            }
+                            Spacer(Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Incoming call popup",
+                                    style = MaterialTheme.typography.titleSmallEmphasized.copy(fontWeight = FontWeight.Bold)
+                                )
+                                Text(
+                                    text = if (incomingFullscreen) "Open in full-screen popup" else "Show only notification/bubble",
+                                    style = MaterialTheme.typography.labelSmallEmphasized.copy(
+                                        color = if (incomingFullscreen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                                Text(
+                                    text = "Full-screen shows Cinnamon call UI over other apps",
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                            }
+                        }
+                    }
+                    // Use SwitchSettingsCard for consistent M3 style — but we need inline switch
+                    // Instead, add a custom switch row
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = if (incomingFullscreen) "Enabled — full-screen" else "Disabled — notification only",
+                            style = MaterialTheme.typography.labelMediumEmphasized.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                        androidx.compose.material3.Switch(
+                            checked = incomingFullscreen,
+                            onCheckedChange = { incomingFullscreen = it }
+                        )
+                    }
+                }
+            }
+
             Spacer(Modifier.height(12.dp))
             Text(
-                text = "Tips: grant overlay permission for bubble over other apps (Settings → Apps → Cinnamon → Display over other apps).",
+                text = "Tips: grant overlay permission for bubble over other apps (Settings → Apps → Cinnamon → Display over other apps). Full-screen requires \"Display over other apps\" + notification permission.",
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
