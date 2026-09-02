@@ -65,6 +65,7 @@ import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.app.providers.PhotoQuality
 import com.sosauce.cinnamon.core.ui.CinnamonTheme
 import com.sosauce.cinnamon.core.ui.components.DefaultContactIcon
+import com.sosauce.cinnamon.core.datastore.rememberExpressiveBlurEnabled
 import com.sosauce.cinnamon.core.utils.LocalHazeState
 import com.sosauce.cinnamon.core.utils.cuteHazeEffect
 import com.sosauce.cinnamon.core.utils.rememberHazeState
@@ -108,19 +109,25 @@ fun CallScreen(
     val pulseAlpha1 = if (isRinging || isDialing) 0.18f else 0f
     val pulseAlpha2 = if (isRinging || isDialing) 0.09f else 0f
     val hazeState = rememberHazeState()
+    val expressiveBlurEnabled by rememberExpressiveBlurEnabled()
 
     androidx.compose.runtime.CompositionLocalProvider(LocalHazeState provides hazeState) {
         Scaffold(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.onSurface,
             bottomBar = {
-                // M3 Expressive blur — bottom bar hazed over poster behind
+                // M3 Expressive blur — bottom bar hazed over poster behind (toggleable)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .cuteHazeEffect(
-                            state = hazeState,
-                            backgroundColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.82f)
+                        .then(
+                            if (expressiveBlurEnabled) Modifier.cuteHazeEffect(
+                                state = hazeState,
+                                backgroundColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.82f)
+                            ) else Modifier.background(
+                                color = MaterialTheme.colorScheme.surfaceContainer,
+                                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+                            )
                         )
                 ) {
                     AnimatedContent(
@@ -144,7 +151,7 @@ fun CallScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.surface)
-                    .hazeSource(state = hazeState)
+                    .then(if (expressiveBlurEnabled) Modifier.hazeSource(state = hazeState) else Modifier)
             ) {
                 // Poster / backdrop with expressive scrim + tonal gradient
                 AsyncImage(

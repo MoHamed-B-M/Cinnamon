@@ -40,11 +40,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
-import com.sosauce.cinnamon.core.datastore.rememberIncomingCallFullscreen
 import com.sosauce.cinnamon.core.utils.createDefaultDialerIntent
 import com.sosauce.cinnamon.core.utils.createDefaultSmsIntent
 import com.sosauce.cinnamon.settings.components.SettingsWithTitle
-import com.sosauce.cinnamon.settings.components.SwitchSettingsCard
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 
@@ -342,86 +340,6 @@ fun SettingsPermissions() {
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Text("Set as default SMS", style = MaterialTheme.typography.labelLargeEmphasized.copy(fontWeight = FontWeight.Bold))
-                    }
-                }
-            }
-
-            // Incoming call full-screen popup — M3 Expressive
-            var incomingFullscreen by rememberIncomingCallFullscreen()
-            Spacer(Modifier.height(12.dp))
-            Card(
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 2.dp),
-                shape = RoundedCornerShape(24.dp)
-            ) {
-                Column(modifier = Modifier.padding(4.dp)) {
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = if (incomingFullscreen) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest,
-                                modifier = Modifier.size(40.dp)
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.phone_filled),
-                                    contentDescription = null,
-                                    tint = if (incomingFullscreen) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .size(24.dp)
-                                )
-                            }
-                            Spacer(Modifier.width(12.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "Incoming call popup",
-                                    style = MaterialTheme.typography.titleSmallEmphasized.copy(fontWeight = FontWeight.Bold)
-                                )
-                                Text(
-                                    text = if (incomingFullscreen) "Open in full-screen popup" else "Show only notification/bubble",
-                                    style = MaterialTheme.typography.labelSmallEmphasized.copy(
-                                        color = if (incomingFullscreen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                )
-                                Text(
-                                    text = "Full-screen shows Cinnamon call UI over other apps",
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                )
-                            }
-                        }
-                    }
-                    // Use SwitchSettingsCard for consistent M3 style — but we need inline switch
-                    // Instead, add a custom switch row
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = if (incomingFullscreen) "Enabled — full-screen" else "Disabled — notification only",
-                            style = MaterialTheme.typography.labelMediumEmphasized.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        )
-                        androidx.compose.material3.Switch(
-                            checked = incomingFullscreen,
-                            onCheckedChange = { incomingFullscreen = it }
-                        )
                     }
                 }
             }
