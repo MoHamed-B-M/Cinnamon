@@ -124,10 +124,20 @@ class CallService : InCallService(), CallServiceCallback, AndroidCallCallback, K
             addFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK or
                         Intent.FLAG_ACTIVITY_SINGLE_TOP or
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_NO_USER_ACTION
             )
         }
-        startActivity(intent)
+        // InCallService is allowed to start activity, but on Android 10+ background
+        // launches are restricted — ensure we are foreground or use fullScreenIntent.
+        // Callers (CallManager/ViewModel) also launch CallActivity directly as immediate UI,
+        // this is a fallback for Telecom-triggered calls (incoming / from other apps).
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            // Fallback: rely on notification fullScreenIntent
+            android.util.Log.w("CallService", "launchCallActivity failed, relying on fullScreenIntent", e)
+        }
     }
 
 
@@ -165,13 +175,20 @@ class CallService : InCallService(), CallServiceCallback, AndroidCallCallback, K
                     callManager.updateNumber(
                         call.details?.handle?.schemeSpecificPart ?: getString(R.string.unknown)
                     )
-                    callNotificationManager.createIncomingNotification(call.details)
+                    // For incoming, ensure foreground before fullScreenIntent
+                    val notif = callNotificationManager.createIncomingNotification(call.details)
+                    // Also try to launch UI directly for devices that allow it
+                    // (relies on fullScreenIntent as primary)
+                    try { launchCallActivity() } catch (_: Exception) {}
+                    notif
                 }
 
                 Call.STATE_DIALING, Call.STATE_CONNECTING -> {
                     callManager.updateCallState(CallState.DIALING)
+                    // Create notification first to ensure foreground priority on Android 10+
+                    val notif = callNotificationManager.createOutgoingNotification(call.details)
                     launchCallActivity()
-                    callNotificationManager.createOutgoingNotification(call.details)
+                    notif
                 }
 
                 Call.STATE_ACTIVE -> {
