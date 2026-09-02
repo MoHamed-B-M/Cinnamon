@@ -19,6 +19,7 @@ import com.sosauce.cinnamon.core.datastore.rememberEnableDeliveryReports
 import com.sosauce.cinnamon.core.datastore.rememberSendGroupAsMms
 import com.sosauce.cinnamon.core.datastore.rememberSendLongAsMms
 import com.sosauce.cinnamon.core.datastore.rememberShowCharCount
+import com.sosauce.cinnamon.core.datastore.rememberSwipeToDeleteEnabled
 import com.sosauce.cinnamon.settings.components.SettingsWithTitle
 import com.sosauce.cinnamon.settings.components.SimSelector
 import com.sosauce.cinnamon.settings.components.SwitchSettingsCard
@@ -34,6 +35,7 @@ fun SettingsMessages() {
     val simsViewModel = koinViewModel<SimsViewModel>()
     var defaultMessagesSims by rememberDefaultMessagesSim()
     var showCharCount by rememberShowCharCount()
+    var swipeToDelete by rememberSwipeToDeleteEnabled()
 
 
     Column {
@@ -92,8 +94,15 @@ fun SettingsMessages() {
                 checked = enableDeliveryReports,
                 onCheckedChange = { enableDeliveryReports = !enableDeliveryReports },
                 topDp = 4.dp,
-                bottomDp = 24.dp,
+                bottomDp = 4.dp,
                 text = "Enable delivery reports"
+            )
+            SwitchSettingsCard(
+                checked = swipeToDelete,
+                onCheckedChange = { swipeToDelete = !swipeToDelete },
+                topDp = 4.dp,
+                bottomDp = 24.dp,
+                text = "Swipe to delete conversations"
             )
         }
     }

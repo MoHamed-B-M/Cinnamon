@@ -51,8 +51,11 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.sosauce.cinnamon.R
 import com.sosauce.cinnamon.app.navigation.Screen
 import com.sosauce.cinnamon.core.ui.components.ScreenSelection
+import com.sosauce.cinnamon.core.datastore.rememberExpressiveBlurEnabled
 import com.sosauce.cinnamon.core.ui.nunitoFontFamily
+import com.sosauce.cinnamon.core.utils.LocalHazeState
 import com.sosauce.cinnamon.core.utils.LocalScreen
+import com.sosauce.cinnamon.core.utils.cuteHazeEffect
 import com.sosauce.cinnamon.core.utils.rememberSearchbarMaxFloatValue
 import com.sosauce.cinnamon.core.utils.rememberSearchbarRightPadding
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
@@ -77,6 +80,8 @@ fun CuteSearchbar(
     val currentScreen = LocalScreen.current
     var isInScreenSelectionMode by remember { mutableStateOf(false) }
     val isSearching = textFieldState.text.isNotEmpty()
+    val hazeState = LocalHazeState.current
+    val expressiveBlurEnabled by rememberExpressiveBlurEnabled()
 
 
 
@@ -101,7 +106,12 @@ fun CuteSearchbar(
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(24.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .then(
+                    if (expressiveBlurEnabled) Modifier.cuteHazeEffect(
+                        state = hazeState,
+                        backgroundColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.82f)
+                    ) else Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
+                )
         ) {
             this@Column.AnimatedVisibility(
                 visible = showSearchField
@@ -110,7 +120,10 @@ fun CuteSearchbar(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(24.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                        .then(
+                            if (expressiveBlurEnabled) Modifier.background(Color.Transparent)
+                            else Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
+                        )
                         .padding(6.dp)
                 ) {
                     SharedTransitionLayout {

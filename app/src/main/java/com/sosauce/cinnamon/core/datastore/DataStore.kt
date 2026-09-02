@@ -49,6 +49,7 @@ data object PreferencesKeys {
     val INCOMING_CALL_FULLSCREEN = booleanPreferencesKey("INCOMING_CALL_FULLSCREEN")
     val ENABLE_EXPRESSIVE_BLUR = booleanPreferencesKey("ENABLE_EXPRESSIVE_BLUR")
     val ENABLE_MOTION_BLUR = booleanPreferencesKey("ENABLE_MOTION_BLUR")
+    val ENABLE_SWIPE_TO_DELETE = booleanPreferencesKey("ENABLE_SWIPE_TO_DELETE")
 }
 
 
@@ -116,6 +117,9 @@ fun rememberExpressiveBlurEnabled() = rememberPreference(PreferencesKeys.ENABLE_
 
 @Composable
 fun rememberMotionBlurEnabled() = rememberPreference(PreferencesKeys.ENABLE_MOTION_BLUR, true)
+
+@Composable
+fun rememberSwipeToDeleteEnabled() = rememberPreference(PreferencesKeys.ENABLE_SWIPE_TO_DELETE, true)
 
 @Composable
 fun rememberInitialScreen() = rememberPreference(PreferencesKeys.DEFAULT_TAB, DefaultTabOption.MESSAGES)
