@@ -74,7 +74,6 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           echo "Validating keystore alias=$KEY_ALIAS ..."
-          # Try list — this catches 'Given final block not properly padded' (wrong password / corrupt b64) early
           if ! keytool -list -keystore "$PWD/cinnamon-release.jks" -alias "$KEY_ALIAS" -storepass "$KEYSTORE_PASSWORD" >/tmp/kt.log 2>&1; then
             echo "::error::Keystore validation failed — wrong KEYSTORE_PASSWORD / KEY_ALIAS or corrupt KEYSTORE_FILE_B64"
             echo "--- keytool output ---"
@@ -85,8 +84,21 @@ jobs:
             echo "Hint: Regenerate b64 with: [Convert]::ToBase64String([IO.File]::ReadAllBytes('cinnamon-release.jks')) | Set-Content -NoNewline keystore.b64  (PowerShell) or base64 -w 0 (Linux) — NOT certutil -encode"
             exit 1
           fi
-          echo "Keystore OK — alias exists"
+          echo "Keystore OK — storepass + alias valid"
           keytool -list -v -keystore "$PWD/cinnamon-release.jks" -alias "$KEY_ALIAS" -storepass "$KEYSTORE_PASSWORD" | head -n 25
+          echo ""
+          echo "Validating KEY_PASSWORD for alias=$KEY_ALIAS ..."
+          # This catches 'Given final block not properly padded' when KEY_PASSWORD is wrong (storepass correct but keypass wrong)
+          if ! keytool -importkeystore -srckeystore "$PWD/cinnamon-release.jks" -destkeystore /tmp/test.p12 -srcstoretype JKS -deststoretype PKCS12 -srcstorepass "$KEYSTORE_PASSWORD" -deststorepass "$KEYSTORE_PASSWORD" -srcalias "$KEY_ALIAS" -srckeypass "$KEY_PASSWORD" -noprompt >/tmp/kp.log 2>&1; then
+            echo "::error::KEY_PASSWORD validation failed — wrong KEY_PASSWORD for alias $KEY_ALIAS (or KEY_ALIAS typo)"
+            cat /tmp/kp.log
+            echo "---"
+            echo "If you created keystore with -storepass == -keypass, set KEY_PASSWORD same as KEYSTORE_PASSWORD"
+            echo "List aliases to verify: keytool -list -keystore cinnamon-release.jks -storepass <pass>"
+            exit 1
+          fi
+          echo "KEY_PASSWORD OK"
+          rm -f /tmp/test.p12 /tmp/kt.log /tmp/kp.log
 
       - name: Export signing env
         run: |
