@@ -129,313 +129,312 @@ fun CallScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
         ) {
-                // Poster / backdrop with expressive scrim + tonal gradient
-                AsyncImage(
-                    model = callUiState.poster.toUri(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                    colorFilter = ColorFilter.tint(
-                        color = Color.Black.copy(alpha = 0.22f),
-                        blendMode = BlendMode.Darken
-                    ),
-                )
-                // Expressive gradient scrim — surface tonal wash
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Black.copy(alpha = 0.05f),
-                                    Color.Black.copy(alpha = 0.18f),
-                                    MaterialTheme.colorScheme.scrim.copy(alpha = 0.35f),
-                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
-                                ),
-                                startY = 0f,
-                                endY = Float.POSITIVE_INFINITY
-                            )
+            // Poster / backdrop with expressive scrim + tonal gradient
+            AsyncImage(
+                model = callUiState.poster.toUri(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+                colorFilter = ColorFilter.tint(
+                    color = Color.Black.copy(alpha = 0.22f),
+                    blendMode = BlendMode.Darken
+                ),
+            )
+            // Expressive gradient scrim — surface tonal wash
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Black.copy(alpha = 0.05f),
+                                Color.Black.copy(alpha = 0.18f),
+                                MaterialTheme.colorScheme.scrim.copy(alpha = 0.35f),
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
+                            ),
+                            startY = 0f,
+                            endY = Float.POSITIVE_INFINITY
                         )
-                )
-                // Subtle radial vignette behind avatar for depth
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.radialGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.14f),
-                                    Color.Transparent
-                                ),
-                                radius = 900f
-                            )
+                    )
+            )
+            // Subtle radial vignette behind avatar for depth
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.14f),
+                                Color.Transparent
+                            ),
+                            radius = 900f
                         )
-                )
+                    )
+            )
 
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .statusBarsPadding()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Top spacer for breathing room — 8dp system
+                Spacer(Modifier.height(24.dp))
+
+                // Center hero — Expressive avatar cluster
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .statusBarsPadding()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceBetween
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Top spacer for breathing room — 8dp system
-                    Spacer(Modifier.height(24.dp))
-
-                    // Center hero — Expressive avatar cluster
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.fillMaxWidth()
+                    // Avatar with expressive squircle + pulse rings
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.padding(top = 12.dp)
                     ) {
-                        // Avatar with expressive squircle + pulse rings
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.padding(top = 12.dp)
-                        ) {
-                            // Outer pulse rings — tonal expressive elevation cue
-                            if (isRinging || isDialing) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(268.dp)
-                                        .scale(pulseScale2)
-                                        .clip(MaterialShapes.Cookie9Sided.toShape())
-                                        .background(
-                                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = pulseAlpha2)
-                                        )
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .size(236.dp)
-                                        .scale(pulseScale1)
-                                        .clip(MaterialShapes.Cookie9Sided.toShape())
-                                        .background(
-                                            MaterialTheme.colorScheme.primary.copy(alpha = pulseAlpha1)
-                                        )
-                                )
-                            }
-                            // Soft shadow / tonal container behind avatar
+                        // Outer pulse rings — tonal expressive elevation cue
+                        if (isRinging || isDialing) {
                             Box(
                                 modifier = Modifier
-                                    .size(196.dp)
+                                    .size(268.dp)
+                                    .scale(pulseScale2)
                                     .clip(MaterialShapes.Cookie9Sided.toShape())
-                                    .background(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.55f))
-                            )
-                            DefaultContactIcon(
-                                firstLetter = callUiState.displayName.firstOrNull(),
-                                size = 184.dp,
-                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                shape = MaterialShapes.Cookie9Sided.toShape(),
-                                contactPhoneNumber = callUiState.number,
-                                quality = PhotoQuality.FULL_QUALITY
-                            )
-                            // Expressive status dot — shows muted / holding
-                            androidx.compose.animation.AnimatedVisibility(
-                                visible = callUiState.isHolding || callUiState.isMuted,
-                                enter = scaleIn(bouncySpec()) + fadeIn(),
-                                exit = scaleOut(bouncySpec()) + fadeOut(),
-                                modifier = Modifier.align(Alignment.BottomEnd)
-                            ) {
-                                Surface(
-                                    shape = CircleShape,
-                                    color = if (callUiState.isHolding) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.tertiaryContainer,
-                                    tonalElevation = 3.dp,
-                                    shadowElevation = 6.dp,
-                                    modifier = Modifier.padding(end = 6.dp, bottom = 6.dp)
-                                ) {
-                                    Icon(
-                                        painter = painterResource(
-                                            if (callUiState.isHolding) R.drawable.pause_filled else R.drawable.mic_off
-                                        ),
-                                        contentDescription = null,
-                                        tint = if (callUiState.isHolding) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onTertiaryContainer,
-                                        modifier = Modifier
-                                            .padding(10.dp)
-                                            .size(18.dp)
+                                    .background(
+                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = pulseAlpha2)
                                     )
-                                }
-                            }
-                        }
-
-                        // Name + number — emphasized expressive typography
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = callUiState.displayName.ifBlank { callUiState.number.ifBlank { stringResource(R.string.unknown) } },
-                                maxLines = 1,
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.headlineLargeEmphasized.copy(
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                ),
-                                modifier = Modifier
-                                    .basicMarquee()
-                                    .fillMaxWidth()
                             )
-                            // Secondary number when displayName differs
-                            if (callUiState.displayName.isNotBlank() && callUiState.number.isNotBlank() && callUiState.displayName != callUiState.number) {
-                                Text(
-                                    text = callUiState.number,
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    ),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-
-                            // Expressive status chip — tonal, pill, with icon
-                            val secondaryText: AnnotatedString = when (callUiState.callState) {
-                                CallState.RINGING -> buildAnnotatedString {
-                                    append(stringResource(R.string.via))
-                                    append(" ")
-                                    withStyle(SpanStyle(color = Color(callUiState.activeSim.color), fontWeight = FontWeight.Bold)) {
-                                        append(callUiState.activeSim.name)
-                                    }
-                                }
-                                CallState.DIALING -> AnnotatedString(stringResource(R.string.ringing))
-                                CallState.ENDED -> AnnotatedString(stringResource(R.string.call_ended))
-                                CallState.ONGOING -> AnnotatedString(
-                                    callUiState.timeSpentInCall.toStopwatch(DurationUnit.SECONDS)
-                                )
-                            }
-
-                            val chipContainer: Color
-                            val chipContent: Color
-                            val chipIcon: Int?
-                            val chipLabel: String
-
-                            when (callUiState.callState) {
-                                CallState.RINGING -> {
-                                    chipContainer = MaterialTheme.colorScheme.secondaryContainer
-                                    chipContent = MaterialTheme.colorScheme.onSecondaryContainer
-                                    chipIcon = R.drawable.sim_card
-                                    chipLabel = secondaryText.text
-                                }
-                                CallState.DIALING -> {
-                                    chipContainer = MaterialTheme.colorScheme.tertiaryContainer
-                                    chipContent = MaterialTheme.colorScheme.onTertiaryContainer
-                                    chipIcon = R.drawable.phone
-                                    chipLabel = secondaryText.text
-                                }
-                                CallState.ENDED -> {
-                                    chipContainer = MaterialTheme.colorScheme.surfaceContainerHighest
-                                    chipContent = MaterialTheme.colorScheme.onSurfaceVariant
-                                    chipIcon = null
-                                    chipLabel = secondaryText.text
-                                }
-                                CallState.ONGOING -> {
-                                    chipContainer = MaterialTheme.colorScheme.primaryContainer
-                                    chipContent = MaterialTheme.colorScheme.onPrimaryContainer
-                                    chipIcon = R.drawable.timer
-                                    chipLabel = secondaryText.text
-                                }
-                            }
-
-                            // Use AssistChip for full expressive pill + motion
-                            // Fallback to Surface chip for annotated SIM color
-                            if (callUiState.callState == CallState.RINGING) {
-                                Surface(
-                                    shape = RoundedCornerShape(50),
-                                    color = chipContainer,
-                                    tonalElevation = 2.dp,
-                                    modifier = Modifier.padding(top = 4.dp)
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.sim_card_filled),
-                                            contentDescription = null,
-                                            tint = chipContent,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Text(
-                                            text = secondaryText,
-                                            style = MaterialTheme.typography.labelLargeEmphasized.copy(
-                                                color = chipContent
-                                            )
-                                        )
-                                    }
-                                }
-                            } else {
-                                AssistChip(
-                                    onClick = {},
-                                    enabled = false,
-                                    label = {
-                                        Text(
-                                            text = chipLabel,
-                                            style = MaterialTheme.typography.labelLargeEmphasized
-                                        )
-                                    },
-                                    leadingIcon = chipIcon?.let {
-                                        {
-                                            Icon(
-                                                painter = painterResource(it),
-                                                contentDescription = null,
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                        }
-                                    },
-                                    colors = AssistChipDefaults.assistChipColors(
-                                        containerColor = chipContainer,
-                                        labelColor = chipContent,
-                                        leadingIconContentColor = chipContent,
-                                        disabledContainerColor = chipContainer,
-                                        disabledLabelColor = chipContent,
-                                        disabledLeadingIconContentColor = chipContent
-                                    ),
-                                    border = null,
-                                    shape = RoundedCornerShape(50),
-                                    modifier = Modifier.padding(top = 4.dp)
-                                )
-                            }
-
-                            // On-hold expressive banner chip
-                            AnimatedVisibility(
-                                visible = callUiState.isHolding,
-                                enter = scaleIn(bouncySpec()) + fadeIn(),
-                                exit = scaleOut(bouncySpec()) + fadeOut()
+                            Box(
+                                modifier = Modifier
+                                    .size(236.dp)
+                                    .scale(pulseScale1)
+                                    .clip(MaterialShapes.Cookie9Sided.toShape())
+                                    .background(
+                                        MaterialTheme.colorScheme.primary.copy(alpha = pulseAlpha1)
+                                    )
+                            )
+                        }
+                        // Soft shadow / tonal container behind avatar
+                        Box(
+                            modifier = Modifier
+                                .size(196.dp)
+                                .clip(MaterialShapes.Cookie9Sided.toShape())
+                                .background(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.55f))
+                        )
+                        DefaultContactIcon(
+                            firstLetter = callUiState.displayName.firstOrNull(),
+                            size = 184.dp,
+                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            shape = MaterialShapes.Cookie9Sided.toShape(),
+                            contactPhoneNumber = callUiState.number,
+                            quality = PhotoQuality.FULL_QUALITY
+                        )
+                        // Expressive status dot — shows muted / holding
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = callUiState.isHolding || callUiState.isMuted,
+                            enter = scaleIn(bouncySpec()) + fadeIn(),
+                            exit = scaleOut(bouncySpec()) + fadeOut(),
+                            modifier = Modifier.align(Alignment.BottomEnd)
+                        ) {
+                            Surface(
+                                shape = CircleShape,
+                                color = if (callUiState.isHolding) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.tertiaryContainer,
+                                tonalElevation = 3.dp,
+                                shadowElevation = 6.dp,
+                                modifier = Modifier.padding(end = 6.dp, bottom = 6.dp)
                             ) {
-                                Surface(
-                                    shape = RoundedCornerShape(50),
-                                    color = MaterialTheme.colorScheme.errorContainer,
-                                    tonalElevation = 2.dp,
-                                    modifier = Modifier.padding(top = 2.dp)
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.pause_filled),
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.onErrorContainer,
-                                            modifier = Modifier.size(14.dp)
-                                        )
-                                        Text(
-                                            text = stringResource(R.string.on_hold),
-                                            style = MaterialTheme.typography.labelMediumEmphasized.copy(
-                                                color = MaterialTheme.colorScheme.onErrorContainer
-                                            )
-                                        )
-                                    }
-                                }
+                                Icon(
+                                    painter = painterResource(
+                                        if (callUiState.isHolding) R.drawable.pause_filled else R.drawable.mic_off
+                                    ),
+                                    contentDescription = null,
+                                    tint = if (callUiState.isHolding) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onTertiaryContainer,
+                                    modifier = Modifier
+                                        .padding(10.dp)
+                                        .size(18.dp)
+                                )
                             }
                         }
                     }
 
-                    // Bottom spacer keeps avatar centered with breathing room above bottom bar
-                    Spacer(Modifier.height(16.dp))
+                    // Name + number — emphasized expressive typography
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = callUiState.displayName.ifBlank { callUiState.number.ifBlank { stringResource(R.string.unknown) } },
+                            maxLines = 1,
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.headlineLargeEmphasized.copy(
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            ),
+                            modifier = Modifier
+                                .basicMarquee()
+                                .fillMaxWidth()
+                        )
+                        // Secondary number when displayName differs
+                        if (callUiState.displayName.isNotBlank() && callUiState.number.isNotBlank() && callUiState.displayName != callUiState.number) {
+                            Text(
+                                text = callUiState.number,
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                ),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+
+                        // Expressive status chip — tonal, pill, with icon
+                        val secondaryText: AnnotatedString = when (callUiState.callState) {
+                            CallState.RINGING -> buildAnnotatedString {
+                                append(stringResource(R.string.via))
+                                append(" ")
+                                withStyle(SpanStyle(color = Color(callUiState.activeSim.color), fontWeight = FontWeight.Bold)) {
+                                    append(callUiState.activeSim.name)
+                                }
+                            }
+                            CallState.DIALING -> AnnotatedString(stringResource(R.string.ringing))
+                            CallState.ENDED -> AnnotatedString(stringResource(R.string.call_ended))
+                            CallState.ONGOING -> AnnotatedString(
+                                callUiState.timeSpentInCall.toStopwatch(DurationUnit.SECONDS)
+                            )
+                        }
+
+                        val chipContainer: Color
+                        val chipContent: Color
+                        val chipIcon: Int?
+                        val chipLabel: String
+
+                        when (callUiState.callState) {
+                            CallState.RINGING -> {
+                                chipContainer = MaterialTheme.colorScheme.secondaryContainer
+                                chipContent = MaterialTheme.colorScheme.onSecondaryContainer
+                                chipIcon = R.drawable.sim_card
+                                chipLabel = secondaryText.text
+                            }
+                            CallState.DIALING -> {
+                                chipContainer = MaterialTheme.colorScheme.tertiaryContainer
+                                chipContent = MaterialTheme.colorScheme.onTertiaryContainer
+                                chipIcon = R.drawable.phone
+                                chipLabel = secondaryText.text
+                            }
+                            CallState.ENDED -> {
+                                chipContainer = MaterialTheme.colorScheme.surfaceContainerHighest
+                                chipContent = MaterialTheme.colorScheme.onSurfaceVariant
+                                chipIcon = null
+                                chipLabel = secondaryText.text
+                            }
+                            CallState.ONGOING -> {
+                                chipContainer = MaterialTheme.colorScheme.primaryContainer
+                                chipContent = MaterialTheme.colorScheme.onPrimaryContainer
+                                chipIcon = R.drawable.timer
+                                chipLabel = secondaryText.text
+                            }
+                        }
+
+                        // Use AssistChip for full expressive pill + motion
+                        // Fallback to Surface chip for annotated SIM color
+                        if (callUiState.callState == CallState.RINGING) {
+                            Surface(
+                                shape = RoundedCornerShape(50),
+                                color = chipContainer,
+                                tonalElevation = 2.dp,
+                                modifier = Modifier.padding(top = 4.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.sim_card_filled),
+                                        contentDescription = null,
+                                        tint = chipContent,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text(
+                                        text = secondaryText,
+                                        style = MaterialTheme.typography.labelLargeEmphasized.copy(
+                                            color = chipContent
+                                        )
+                                    )
+                                }
+                            }
+                        } else {
+                            AssistChip(
+                                onClick = {},
+                                enabled = false,
+                                label = {
+                                    Text(
+                                        text = chipLabel,
+                                        style = MaterialTheme.typography.labelLargeEmphasized
+                                    )
+                                },
+                                leadingIcon = chipIcon?.let {
+                                    {
+                                        Icon(
+                                            painter = painterResource(it),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                },
+                                colors = AssistChipDefaults.assistChipColors(
+                                    containerColor = chipContainer,
+                                    labelColor = chipContent,
+                                    leadingIconContentColor = chipContent,
+                                    disabledContainerColor = chipContainer,
+                                    disabledLabelColor = chipContent,
+                                    disabledLeadingIconContentColor = chipContent
+                                ),
+                                border = null,
+                                shape = RoundedCornerShape(50),
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+
+                        // On-hold expressive banner chip
+                        AnimatedVisibility(
+                            visible = callUiState.isHolding,
+                            enter = scaleIn(bouncySpec()) + fadeIn(),
+                            exit = scaleOut(bouncySpec()) + fadeOut()
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(50),
+                                color = MaterialTheme.colorScheme.errorContainer,
+                                tonalElevation = 2.dp,
+                                modifier = Modifier.padding(top = 2.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.pause_filled),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onErrorContainer,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.on_hold),
+                                        style = MaterialTheme.typography.labelMediumEmphasized.copy(
+                                            color = MaterialTheme.colorScheme.onErrorContainer
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
+
+                // Bottom spacer keeps avatar centered with breathing room above bottom bar
+                Spacer(Modifier.height(16.dp))
             }
         }
     }

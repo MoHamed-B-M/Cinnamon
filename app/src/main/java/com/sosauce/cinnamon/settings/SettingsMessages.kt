@@ -96,15 +96,8 @@ fun SettingsMessages() {
                 checked = enableDeliveryReports,
                 onCheckedChange = { enableDeliveryReports = !enableDeliveryReports },
                 topDp = 4.dp,
-                bottomDp = 4.dp,
-                text = "Enable delivery reports"
-            )
-            SwitchSettingsCard(
-                checked = swipeToDelete,
-                onCheckedChange = { swipeToDelete = !swipeToDelete },
-                topDp = 4.dp,
                 bottomDp = 24.dp,
-                text = "Swipe to delete conversations"
+                text = "Enable delivery reports"
             )
         }
     }
