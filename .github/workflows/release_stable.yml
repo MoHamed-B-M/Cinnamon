@@ -1,73 +1,130 @@
-  name: Build & Release
+name: Build & Release (Stable)
 
-  on:
-    workflow_dispatch:
+on:
+  push:
+    branches: [main]
+    # Optional: only run when version changes or manually
+    # paths: ['app/build.gradle.kts', 'app/src/**']
+  workflow_dispatch:
 
-  jobs:
-    build:
-      runs-on: ubuntu-latest
+permissions:
+  contents: write
 
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-        - name: Set up JDK
-          uses: actions/setup-java@v5
-          with:
-            distribution: temurin
-            java-version: 21
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
 
-        - name: Extract versionName
-          id: version
-          run: |
-            VER=$(grep -oP 'versionName\s*=\s*"\K[0-9.]+' app/build.gradle* | head -n1)
-            
-            if [ -z "$VER" ]; then
-              echo "Could not determine versionName"
-              exit 1
-            fi
-            
-            echo "VERSION=$VER" >> "$GITHUB_ENV"
-            echo "TAG=v$VER" >> "$GITHUB_ENV"
-            
-            echo "Detected versionName: $VER"
-            echo "Release tag: v$VER"
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-        - name: Decode keystore
-          env:
-            KEYSTORE_FILE_B64: ${{ secrets.KEYSTORE_FILE_B64 }}
-          run: |
-            echo "$KEYSTORE_FILE_B64" | base64 -d > my-release-key.jks
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-        - name: Export signing env
-          run: |
-            {
-              echo "KEYSTORE_FILE=$PWD/my-release-key.jks"
-              echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}"
-              echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}"
-              echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}"
-            } >> "$GITHUB_ENV"
+      - name: Extract versionName
+        id: version
+        run: |
+          VER=$(grep -oP 'versionName\s*=\s*"\K[0-9.]+' app/build.gradle.kts | head -n1)
+          if [ -z "$VER" ]; then
+            echo "Could not determine versionName from app/build.gradle.kts"
+            exit 1
+          fi
+          echo "VERSION=$VER" >> "$GITHUB_ENV"
+          echo "TAG=v$VER" >> "$GITHUB_ENV"
+          echo "APK_NAME=Cinnamon_${VER}.apk" >> "$GITHUB_ENV"
+          echo "Detected versionName: $VER"
+          echo "Release tag: v$VER"
 
-        - name: Build Release APK
-          run: ./gradlew assembleRelease --parallel --no-daemon --no-build-cache
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Tag $TAG already exists locally"
+          elif git ls-remote --tags origin | grep -q "refs/tags/$TAG$"; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Tag $TAG already exists on remote"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
 
-        - name: Create Git tag
-          env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          run: |
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            
-            git tag "$TAG"
-            git push origin "$TAG"
+      - name: Fail if release tag already exists (avoid duplicate)
+        if: steps.check_tag.outputs.exists == 'true'
+        run: |
+          echo "::error::Tag $TAG already exists. Bump versionName in app/build.gradle.kts before pushing to main."
+          exit 1
 
-        - name: Create GitHub Release
-          uses: softprops/action-gh-release@v2
-          with:
-            tag_name: ${{ env.TAG }}
-            name: ${{ env.TAG }}
-            files: app/build/outputs/apk/release/Cinnamon_${{ env.VERSION }}.apk
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Decode keystore
+        env:
+          KEYSTORE_FILE_B64: ${{ secrets.KEYSTORE_FILE_B64 }}
+        run: |
+          if [ -z "$KEYSTORE_FILE_B64" ]; then
+            echo "::error::Missing secret KEYSTORE_FILE_B64. Follow the keystore setup guide in workflow file header."
+            exit 1
+          fi
+          echo "$KEYSTORE_FILE_B64" | base64 -d > "$PWD/cinnamon-release.jks"
+          ls -lh "$PWD/cinnamon-release.jks"
+
+      - name: Export signing env
+        run: |
+          {
+            echo "KEYSTORE_FILE=$PWD/cinnamon-release.jks"
+            echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}"
+            echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}"
+            echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}"
+          } >> "$GITHUB_ENV"
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --parallel --no-daemon
+
+      - name: Verify APK exists
+        run: |
+          ls -lh "app/build/outputs/apk/release/${{ env.APK_NAME }}"
+          echo "APK ready: ${{ env.APK_NAME }}"
+
+      - name: Create Git tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "${{ env.TAG }}" -m "Release ${{ env.TAG }}"
+          git push origin "${{ env.TAG }}"
+
+      - name: Create GitHub Release (stable)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: ${{ env.TAG }}
+          files: app/build/outputs/apk/release/${{ env.APK_NAME }}
+          generate_release_notes: true
+          make_latest: true
+          prerelease: false
+          body: |
+            ### Cinnamon ${{ env.TAG }} — Stable Release
+
+            - **APK:** `${{ env.APK_NAME }}`
+            - **Commit:** `${{ github.sha }}`
+            - **Build:** `${{ github.run_number }}`
+
+            Install the APK directly or grab it from the Assets below.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload APK as artifact (backup)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cinnamon-${{ env.TAG }}
+          path: app/build/outputs/apk/release/${{ env.APK_NAME }}
+          retention-days: 14
