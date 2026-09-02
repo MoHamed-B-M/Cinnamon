@@ -155,11 +155,6 @@ fun CallBottomBar(
                                     onCheckedChange = { onCallAction(CallAction.ToggleMute(!isMuted)) },
                                     enabled = !isEnded,
                                     interactionSource = interactionSources[0],
-                                    shapes = ToggleButtonDefaults.shapes(
-                                        shape = RoundedCornerShape(20.dp),
-                                        pressedShape = RoundedCornerShape(14.dp),
-                                        checkedShape = RoundedCornerShape(20.dp)
-                                    ),
                                     colors = ToggleButtonDefaults.colors(
                                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                         contentColor = MaterialTheme.colorScheme.onSurface,
@@ -172,7 +167,7 @@ fun CallBottomBar(
                                 ) {
                                     Icon(
                                         painter = if (isMuted) painterResource(R.drawable.mic_off) else painterResource(R.drawable.mic),
-                                        contentDescription = stringResource(R.string.mic_off).takeIf { isMuted } ?: "Mute",
+                                        contentDescription = if (isMuted) "Unmute" else "Mute",
                                         modifier = Modifier.size(22.dp)
                                     )
                                 }
@@ -206,11 +201,6 @@ fun CallBottomBar(
                                     },
                                     enabled = !isEnded,
                                     interactionSource = interactionSources[1],
-                                    shapes = ToggleButtonDefaults.shapes(
-                                        shape = RoundedCornerShape(20.dp),
-                                        pressedShape = RoundedCornerShape(14.dp),
-                                        checkedShape = RoundedCornerShape(20.dp)
-                                    ),
                                     colors = ToggleButtonDefaults.colors(
                                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                         contentColor = MaterialTheme.colorScheme.onSurface,
@@ -257,11 +247,6 @@ fun CallBottomBar(
                                     onCheckedChange = { onCallAction(CallAction.ToggleHold) },
                                     enabled = !isEnded,
                                     interactionSource = interactionSources[2],
-                                    shapes = ToggleButtonDefaults.shapes(
-                                        shape = RoundedCornerShape(20.dp),
-                                        pressedShape = RoundedCornerShape(14.dp),
-                                        checkedShape = RoundedCornerShape(20.dp)
-                                    ),
                                     colors = ToggleButtonDefaults.colors(
                                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                         contentColor = MaterialTheme.colorScheme.onSurface,
@@ -309,11 +294,6 @@ fun CallBottomBar(
                                     },
                                     enabled = !isEnded,
                                     interactionSource = interactionSources[3],
-                                    shapes = ToggleButtonDefaults.shapes(
-                                        shape = RoundedCornerShape(20.dp),
-                                        pressedShape = RoundedCornerShape(14.dp),
-                                        checkedShape = RoundedCornerShape(20.dp)
-                                    ),
                                     colors = ToggleButtonDefaults.colors(
                                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                         contentColor = MaterialTheme.colorScheme.onSurface,

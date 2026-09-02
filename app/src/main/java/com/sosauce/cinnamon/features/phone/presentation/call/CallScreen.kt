@@ -233,7 +233,7 @@ fun CallScreen(
                             quality = PhotoQuality.FULL_QUALITY
                         )
                         // Expressive status dot — shows muted / holding
-                        AnimatedVisibility(
+                        androidx.compose.animation.AnimatedVisibility(
                             visible = callUiState.isHolding || callUiState.isMuted,
                             enter = scaleIn(bouncySpec()) + fadeIn(),
                             exit = scaleOut(bouncySpec()) + fadeOut(),
