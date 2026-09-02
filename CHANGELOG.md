@@ -1,45 +1,33 @@
 # Changelog
 
-All notable changes to **Cinnamon** are documented here. This project follows [Keep a Changelog](https://keepachangelog.com/) and uses `beta` for preview and `main` for stable releases.
+All updates to Cinnamon — simple and clear.
 
-## [1.0.5] - 2026-09-02 — Beta `c6d4e93`..`bbf1215` + `58cc40f`..`f44fd04`
+## [1.0.5] - September 2, 2026 — Beta
 
-### Added
-- **Material 3 Expressive Call UI** `CallScreen.kt`, `CallBottomBar.kt`, `IncomingBottomBar.kt`, `Dialpad.kt`, `AudioSwitcher.kt`
-  - Tonal surfaces `surfaceContainer*`, `primaryContainer`, `error`, `secondaryContainer`, `RoundedCornerShape(20-50)` / `Cookie9Sided` squircle, `MotionScheme.expressive()` + `bouncySpec` springs, 8dp spacing, `AssistChip` status chips.
-- **Call bubble overlay** `CallBubble.kt` `CallOverlayManager.kt` — system `TYPE_APPLICATION_OVERLAY` pill `28dp` with tonal blur, avatar pulsing dot, `Mute`/`End` actions, tap to expand to `CallActivity`. Managed by `CallService` via `CinnamonApplication.isCallActivityVisibleFlow`.
-- **M3 Expressive blur** — `Navigation.kt` `hazeSource` + `ScreenSelection.kt` `cuteHazeEffect(surfaceContainer 0.78f)`, `CallScreen.kt` `hazeSource` + bottomBar `cuteHazeEffect(surfaceContainer 0.82f)`. Toggleable via `Look & Feel`.
-- **Permissions screen** `SettingsPermissions.kt` — `Permissions` category `phone_filled` with `Default dialer` `primaryContainer` and `Default messaging` `tertiaryContainer` cards, `Button` `shapes()` to `RoleManager`/`TelecomManager`, status `✓`.
-- **Look & Feel blur toggles** `SettingsLookAndFeel.kt` — `Expressive blur (entire app)` `Blur under navigation bar` `Motion blur` `Incoming call full-screen popup` via `DataStore` `ENABLE_EXPRESSIVE_BLUR`, `ENABLE_MOTION_BLUR`, `INCOMING_CALL_FULLSCREEN`.
-- **Full dialer manifest** `AndroidManifest.xml` — added `VIEW tel:` `BROWSABLE` to `MainActivity` and `CallActivity` for `tel:` links, `SYSTEM_ALERT_WINDOW` for bubble.
+### ✨ What's New
+- **New Call Screens** — Fresh Material 3 Expressive design for outgoing and incoming calls. Bigger avatars, smooth animations, and clearer buttons.
+- **Call Bubble** — When you're on a call and open another app, a small pill stays at the top. Tap to return, mute, or end the call. Has a soft blur background.
+- **Blur Effects** — Soft blur under the navigation bar and call screen. Turn it on or off in *Look & Feel*.
+- **Permissions Screen** — New *Settings → Permissions* page. See if Cinnamon is your default for calls and messages, and set it with one tap.
+- **Incoming Call Popup Control** — Choose how incoming calls appear: full-screen popup or just a bubble/notification. Find it in *Look & Feel*.
 
-### Changed
-- **Incoming bottom bar** — removed swipe `Animatable`/`draggable` pill, kept only `Answer` `primary` / `Decline` `error` `64dp` `RoundedCornerShape(50)` buttons with haptics.
-- **Setup** `SetupScreen.kt:80` — removed dialer step, only `SetupDefaultMessageApp` → `onGotoApp`; `MainActivity.kt:32` now only checks `ROLE_SMS` (`Telephony.Sms`), dialer no longer gates entry.
-- **Calling** `CallingViewModel.kt:50` — removed `defaultDialerPackage` gate; always `startCall()` + optimistic `DIALING` + `startActivity(CallActivity)` so call button always opens Cinnamon UI. Incoming handled via `CallService` `fullScreenIntent` / bubble.
-- **Look & Feel** — moved `Incoming call popup` from `Permissions` to `Look & Feel` (per request) with `Switch`.
+### 🔧 Improvements
+- **Calls Stay in Cinnamon** — Tapping *Call* always opens Cinnamon's call screen. No more jumping to the system dialer.
+- **Dual SIM Handling** — Picking SIM 1 or 2 now stays inside Cinnamon instead of opening the system app.
+- **Full Dialer Ready** — Better handling for calls, even when the app is in the background. Incoming calls show correctly over other apps.
+- **Smoother Look** — More consistent colors, rounded corners, and spacing across the app.
 
-### Fixed
-- **CallScreen compile** `ColumnScope.AnimatedVisibility` inside `BoxScope` → `androidx.compose.animation.AnimatedVisibility` + `ToggleButtonDefaults.shapes` unresolved + `R.string.mic_off` missing (`CallBottomBar.kt:158`), Haze provider brace mismatch (`CallScreen.kt:464`).
-- **End call not working** `CallManager.kt:84` `CallService.kt:301` — fallback `updateCallState(ENDED)` when `androidCallCallback==null`/`cuteCall==null` (optimistic UI before `onCallAdded`), `calls.firstOrNull()?.disconnect()` for multi-call.
-- **SIM chooser opening system dialer** `CallManager.kt:64` — `savedHandle ?: callCapablePhoneAccounts.firstOrNull() ?: getDefaultOutgoingPhoneAccount` fallback + `CallService:224` `STATE_SELECT_PHONE_ACCOUNT` auto-pick first handle, keeping chooser inside Cinnamon.
-- **Phone settings crash** `SimsRepository.kt:38` `SettingsPhone.kt:35` — `getPhoneAccount` null + `SecurityException` try-catch, empty handles placeholder `"No SIM available or permission needed"`.
-- **Navigation only showing Messages** `ScreenSelection.kt:61` — fixed `by rememberExpressiveBlurEnabled()` delegate (was `getValue(...)` function) and `Surface` `Color.Transparent` fallback; restored `ShortNavigationBar` visibility.
-- **Default dialer not working** `SettingsPermissions.kt:207` — `RoleManager` intent launched without `NEW_TASK` via `ActivityResultLauncher`, fallback `TelecomManager.ACTION_CHANGE_DEFAULT_DIALER` with `EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME`.
-- **Incoming popup option** — added `DataStore` `INCOMING_CALL_FULLSCREEN` (default `true`), `CallService:186` `createIncomingNotification(..., useFullScreen)` + conditional `launchCallActivity()` (bubble shows when disabled).
-
-### Services — Full Dialer
-- `CallService.kt` — `onBringToForeground`, `STATE_SELECT_PHONE_ACCOUNT` handling, foreground-first notification, `CuteCallScreeningService.kt` blocked-number check via `BlockedNumberContract`, `onCallRemoved` cleanup, `onCallAudioStateChanged` routes.
-
-### Build & Release
-- **Beta preview** `release_beta.yml` — `push: beta` ephemeral `beta` tag (`gh release delete beta --cleanup-tag`), `Cinnamon_<ver>-beta+<sha>.apk`, `prerelease:true` `make_latest:false`, 7-day artifact, `Haze` `1.7.2` `gradle/actions/setup-gradle@v4`, JDK 21, robust `KEYSTORE_FILE_B64` decode (`sed`/`tr`/`base64 -d`) + `keytool -list` + `importkeystore` `KEY_PASSWORD` validation.
-- **Stable** `release_stable.yml` — `push: main` `v<ver>` `generate_release_notes` `make_latest:true`, tag existence check, same signing, `gradle/actions/setup-gradle`.
-- **Keystore** `scripts/generate-keystore.ps1/.sh` `+ .github/KEYSTORE_SETUP.md` — `KEYSTORE_FILE_B64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD` secrets, `CinnamonApplication` notification channels `calls_id` `INCOMING_MESSAGES_CHANNEL_ID`.
+### 🐛 Bug Fixes
+- Fixed **End call** button not working when you tap it quickly.
+- Fixed **Phone settings** crash when no SIM is available.
+- Fixed **Navigation** showing only Messages — now you can switch between Messages, Contacts, and Dialer again.
+- Fixed **Set as default dialer** button not opening.
+- Fixed **Call screen** not opening when you press call.
 
 ---
 
-## [1.0.4] - 2026-08-26
-- Voicemail, call log lookups refined `c646c7e`.
+## [1.0.4] - August 26, 2026
+- Voicemail and call log search improvements.
 
-## [1.0.3] - 2026-08-22
-- Call logs and settings navigation refactor `6f0f655`.
+## [1.0.3] - August 22, 2026
+- Call logs and settings navigation tweaks.
