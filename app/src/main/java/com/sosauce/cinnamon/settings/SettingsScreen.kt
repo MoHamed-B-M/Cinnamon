@@ -39,8 +39,8 @@ fun SettingsScreen(
     val items = listOf(
         Item(
             icon = R.drawable.phone_filled,
-            name = "Permissions",
-            description = "Default dialer & messaging — call screen & bubble",
+            name = stringResource(R.string.permissions),
+            description = stringResource(R.string.permissions_desc),
             onNavigate = { backStack.add(SettingsScreens.Permissions) }
         ),
         Item(

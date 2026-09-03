@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sosauce.cinnamon.R
@@ -45,6 +46,7 @@ import com.sosauce.cinnamon.core.utils.createDefaultSmsIntent
 import com.sosauce.cinnamon.settings.components.SettingsWithTitle
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
+import sv.lib.squircleshape.SquircleShape
 
 @Composable
 fun SettingsPermissions() {
@@ -98,18 +100,10 @@ fun SettingsPermissions() {
     Column(
         modifier = Modifier.hazeSource(state = hazeState)
     ) {
-        SettingsWithTitle(title = R.string.settings) {
+        SettingsWithTitle(title = R.string.default_apps) {
             // Header
             Text(
-                text = "Permissions — Default apps",
-                style = MaterialTheme.typography.titleMediumEmphasized.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                ),
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-            Text(
-                text = "Set Cinnamon as default to handle calls and messages inside the app (call screen, incoming UI, bubbles).",
+                text = stringResource(R.string.default_apps_desc),
                 style = MaterialTheme.typography.bodySmallEmphasized.copy(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
@@ -117,7 +111,6 @@ fun SettingsPermissions() {
             )
             Spacer(Modifier.height(12.dp))
 
-            // Dialer Card — M3 Expressive tonal + blur-ready
             Card(
                 colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
                 modifier = Modifier
@@ -137,7 +130,7 @@ fun SettingsPermissions() {
                         modifier = Modifier.weight(1f)
                     ) {
                         Surface(
-                            shape = RoundedCornerShape(16.dp),
+                            shape = SquircleShape(16.dp),
                             color = if (isDefaultDialer) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest,
                             modifier = Modifier.size(48.dp)
                         ) {
@@ -157,7 +150,7 @@ fun SettingsPermissions() {
                                 style = MaterialTheme.typography.titleSmallEmphasized.copy(fontWeight = FontWeight.Bold)
                             )
                             Text(
-                                text = if (isDefaultDialer) "Cinnamon is default ✓" else "Not default — calls may open system dialer",
+                                text = if (isDefaultDialer) "Cinnamon is default" else "Not default - calls may open system dialer",
                                 style = MaterialTheme.typography.labelSmallEmphasized.copy(
                                     color = if (isDefaultDialer) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                                 )
@@ -234,7 +227,10 @@ fun SettingsPermissions() {
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Text("Set as default dialer", style = MaterialTheme.typography.labelLargeEmphasized.copy(fontWeight = FontWeight.Bold))
+                        Text(
+                            text = "Set as default dialer",
+                            style = MaterialTheme.typography.labelLargeEmphasized.copy(fontWeight = FontWeight.Bold)
+                        )
                     }
                 }
             }
@@ -259,7 +255,7 @@ fun SettingsPermissions() {
                         modifier = Modifier.weight(1f)
                     ) {
                         Surface(
-                            shape = RoundedCornerShape(16.dp),
+                            shape = SquircleShape(16.dp),
                             color = if (isDefaultSms) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest,
                             modifier = Modifier.size(48.dp)
                         ) {
@@ -279,7 +275,7 @@ fun SettingsPermissions() {
                                 style = MaterialTheme.typography.titleSmallEmphasized.copy(fontWeight = FontWeight.Bold)
                             )
                             Text(
-                                text = if (isDefaultSms) "Cinnamon is default ✓" else "Not default — messages may open system app",
+                                text = if (isDefaultSms) "Cinnamon is default" else "Not default - messages may open system app",
                                 style = MaterialTheme.typography.labelSmallEmphasized.copy(
                                     color = if (isDefaultSms) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error
                                 )

@@ -38,9 +38,7 @@ fun SettingsMessages() {
     var showCharCount by rememberShowCharCount()
 
 
-    Column(
-        modifier = Modifier.verticalScroll(rememberScrollState())
-    ) {
+    Column {
         SettingsWithTitle(title = R.string.messages) {
             Card(
                 colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
