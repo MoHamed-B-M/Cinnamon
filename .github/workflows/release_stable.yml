@@ -1,10 +1,6 @@
 name: Build & Release (Stable)
 
 on:
-  push:
-    branches: [main]
-    # Optional: only run when version changes or manually
-    # paths: ['app/build.gradle.kts', 'app/src/**']
   workflow_dispatch:
 
 permissions:
